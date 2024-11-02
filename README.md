@@ -17,3 +17,16 @@ From the root directory of your project, run the following command to start the 
 
 ```bash
 ./mvnw spring-boot:run
+```
+### 2. Start the Front-End
+```bash
+cd frontEnd
+npm install
+npm start
+```
+
+### 3. Access the Application
+You should get a link in the Console, open it in your browser:
+```bash
+http://localhost:XXXX
+```
