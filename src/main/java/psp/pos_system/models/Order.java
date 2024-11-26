@@ -25,9 +25,10 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private UUID kitasid;
+
     @Column(nullable = false)
     private UUID userID;
+
     @Column(nullable = false)
     private LocalDateTime created;
 
@@ -36,6 +37,7 @@ public class Order {
 
     @Column(nullable = true)
     private LocalDateTime completed;
+
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
