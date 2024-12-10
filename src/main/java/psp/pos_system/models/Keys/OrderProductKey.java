@@ -6,13 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
-public class OrderProductKey {
+public class OrderProductKey implements Serializable {
     @Column(name = "product_id")
     UUID productId;
 

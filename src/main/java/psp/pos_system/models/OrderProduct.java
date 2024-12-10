@@ -1,5 +1,8 @@
 package psp.pos_system.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -9,19 +12,26 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import psp.pos_system.models.Keys.OrderProductKey;
 
 @Entity
-@Data
+@Getter
+@Setter
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "orderProduct", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"order_id", "product_id"})
 })
+
 public class OrderProduct {
     @EmbeddedId
-    OrderProductKey id;
+    private OrderProductKey id;
 
     @ManyToOne
     @MapsId("orderId")

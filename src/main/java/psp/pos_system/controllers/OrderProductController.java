@@ -3,6 +3,7 @@ package psp.pos_system.controllers;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,4 +29,6 @@ public class OrderProductController {
     public ResponseEntity<OrderProduct> createOrderProduct(@PathVariable UUID orderId, @RequestBody CreateOrderProduct createOrderProduct) {
         return new ResponseEntity<>(orderProductService.createOrderProduct(orderId, createOrderProduct), HttpStatus.CREATED);
     }
+
+
 }

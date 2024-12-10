@@ -41,15 +41,17 @@ public class OrderProductImpl implements OrderProductService {
         if (orderProductRepo.existsById(key)) {
             throw new IllegalArgumentException("This product is already associated with the given order");
         }
-        Optional<Order> order = orderRepo.findById(orderId);
-        Optional<Product> product =  productRepo.findById(createOrderProduct.getProductId());
+        var order = orderRepo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        var product =  productRepo.findById(createOrderProduct.getProductId()).orElseThrow(() -> new RuntimeException("Order not found"));;
 
 
         OrderProduct orderProduct = new OrderProduct();
         orderProduct.setId(key);
-        orderProduct.setOrder(order.orElseThrow());
-        orderProduct.setProduct(product.orElseThrow());
+        orderProduct.setOrder(order);
+        orderProduct.setProduct(product);
         orderProduct.setQuantity(createOrderProduct.getQuantity());
+        order.getProducts().add(orderProduct);
+        product.getOrders().add(orderProduct);
         return orderProductRepo.save(orderProduct);
 
     }

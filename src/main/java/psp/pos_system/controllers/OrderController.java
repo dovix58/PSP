@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import psp.pos_system.models.DTO.CreateOrderRequest;
 import psp.pos_system.models.Order;
+import psp.pos_system.models.Product;
 import psp.pos_system.services.OrderService;
 
 import java.util.List;
@@ -49,5 +50,11 @@ public class OrderController {
     public ResponseEntity deleteOrder(@PathVariable UUID id){
         orderService.deleteOrderById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{orderId}/products")
+    public ResponseEntity<List<Product>> getProductsByOrder(@PathVariable UUID orderId) {
+        List<Product> products = orderService.getProductsByOrderId(orderId);
+        return ResponseEntity.ok(products);
     }
 }

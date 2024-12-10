@@ -1,5 +1,7 @@
 package psp.pos_system.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,17 +13,22 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import psp.pos_system.models.enums.OrderStatus;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "orders")
 public class Order {
     @Id
@@ -41,7 +48,9 @@ public class Order {
     private LocalDateTime completed;
 
     @OneToMany(mappedBy = "order")
-    Set<OrderProduct> products;
+    @JsonBackReference
+    @EqualsAndHashCode.Exclude
+    Set<OrderProduct> products = new HashSet<>();
 
 
     @Enumerated(EnumType.STRING)
