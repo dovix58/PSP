@@ -1,32 +1,40 @@
 package psp.pos_system.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
 @Table(name = "products")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+// Nekreipti demesio, cia kai darysim produktu kategorijas
+//    @ManyToOne
+//    @JoinColumn(name = "category_id")
+//    private ProductCategory categoryId;
+
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "product")
-    Set<OrderProduct> orders;
+    //Kaina saugoma centais
+    @Column(nullable = false)
+    private int price;
+
+    // Laikai saugomi UTC laiko zona
+    @Column(nullable = false)
+    private Timestamp created;
+
+    private Timestamp updated;
 }
