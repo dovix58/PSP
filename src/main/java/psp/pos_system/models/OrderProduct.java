@@ -6,6 +6,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,9 @@ import psp.pos_system.models.Keys.OrderProductKey;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "orderProduct")
+@Table(name = "orderProduct", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"order_id", "product_id"})
+})
 public class OrderProduct {
     @EmbeddedId
     OrderProductKey id;

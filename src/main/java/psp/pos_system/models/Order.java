@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 import psp.pos_system.models.enums.OrderStatus;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -37,6 +39,9 @@ public class Order {
 
     @Column(nullable = true)
     private LocalDateTime completed;
+
+    @OneToMany(mappedBy = "order")
+    Set<OrderProduct> products;
 
 
     @Enumerated(EnumType.STRING)
