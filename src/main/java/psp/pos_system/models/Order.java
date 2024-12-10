@@ -27,7 +27,7 @@ public class Order {
     private UUID id;
 
     @Column(nullable = false)
-    private UUID userID;
+    private UUID employeeId;
 
     @Column(nullable = false)
     private LocalDateTime created;

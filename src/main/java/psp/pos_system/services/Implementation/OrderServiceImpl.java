@@ -1,7 +1,6 @@
 package psp.pos_system.services.Implementation;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 import psp.pos_system.models.Order;
 import psp.pos_system.models.enums.OrderStatus;
@@ -10,7 +9,6 @@ import psp.pos_system.services.OrderService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,9 +26,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order createOrder(UUID userId) {
+    public Order createOrder(UUID employeeId) {
         Order order = new Order();
-        order.setUserID(userId);
+        order.setEmployeeId(employeeId);
         order.setOrderStatus(OrderStatus.OPEN);
         order.setCreated(LocalDateTime.now());
         return orderRepo.save(order);
