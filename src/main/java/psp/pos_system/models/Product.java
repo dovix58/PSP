@@ -1,16 +1,23 @@
 package psp.pos_system.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "products")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,4 +44,9 @@ public class Product {
     private Timestamp created;
 
     private Timestamp updated;
+
+    @JsonBackReference
+    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "product")
+    Set<OrderProduct> orders = new HashSet<>();
 }
