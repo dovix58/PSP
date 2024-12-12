@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Button} from "@mui/material"
+import {Box, Button} from "@mui/material"
 import './App.css'
 import {getAllProducts} from "./api/productAPI.ts";
 import {Product} from "./api/entityInterfaces.ts";
@@ -13,15 +13,15 @@ function App() {
 
   return (
     <>
-        <div>
+        <Box>
             {products.map((product) => (
-                <div key={product.id}>
+                <Box key={product.id}>
                     <h2>{product.name}</h2>
                     <p>Price: {product.price} cents</p>
                     <p>Created: {product.created}</p>
-                </div>
+                </Box>
             ))}
-        </div>
+        </Box>
       <Button onClick={handleGetProducts}>Get products</Button>
     </>
   )
