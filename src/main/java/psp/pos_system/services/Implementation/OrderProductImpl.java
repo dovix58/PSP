@@ -2,6 +2,7 @@ package psp.pos_system.services.Implementation;
 
 import org.springframework.stereotype.Service;
 import psp.pos_system.models.DTO.CreateOrderProduct;
+import psp.pos_system.models.DTO.UpdateOrderProductRequest;
 import psp.pos_system.models.Keys.OrderProductKey;
 import psp.pos_system.models.Order;
 import psp.pos_system.models.OrderProduct;
@@ -54,6 +55,38 @@ public class OrderProductImpl implements OrderProductService {
         product.getOrders().add(orderProduct);
         return orderProductRepo.save(orderProduct);
 
+    }
+
+    @Override
+    public OrderProduct getOrderProductById(UUID productId, UUID orderId) {
+        OrderProductKey key = new OrderProductKey(productId, orderId);
+
+        return orderProductRepo.findById(key)
+                .orElseThrow(() -> new IllegalArgumentException("OrderProduct not found for orderId: " + orderId + ", productId: " + productId));
+    }
+
+    @Override
+    public OrderProduct updateOrderProductById(UUID productId, UUID orderId, UpdateOrderProductRequest updateOrderProductRequest) {
+        OrderProductKey key = new OrderProductKey(productId, orderId);
+
+        OrderProduct orderProduct =  orderProductRepo.findById(key)
+                .orElseThrow(() -> new IllegalArgumentException("OrderProduct not found for orderId: " + orderId + ", productId: " + productId));
+        orderProduct.setQuantity(updateOrderProductRequest.getQuantity());
+        return orderProductRepo.save(orderProduct);
+
+
+
+
+
+    }
+
+    @Override
+    public void deleteOrderProductById(UUID productId, UUID orderId) {
+        OrderProductKey key = new OrderProductKey(productId, orderId);
+
+        OrderProduct orderProduct =  orderProductRepo.findById(key)
+                .orElseThrow(() -> new IllegalArgumentException("OrderProduct not found for orderId: " + orderId + ", productId: " + productId));
+        orderProductRepo.deleteById(key);
     }
 
 
