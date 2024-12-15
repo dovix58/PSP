@@ -46,7 +46,6 @@ public class Product {
     private Timestamp updated;
 
     @JsonBackReference
-    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "product")
     Set<OrderProduct> orders = new HashSet<>();
 }
