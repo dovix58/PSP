@@ -76,11 +76,14 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         Set<OrderProduct> orderProducts = order.getProducts();
-        BigInteger totalPrice = null;
+        BigInteger totalPrice = BigInteger.ZERO;
         for (var orderproduct: orderProducts){
-            totalPrice += orderproduct.getPrice();
+            totalPrice = totalPrice.add(orderproduct.getPrice());
         }
+        return totalPrice;
     }
+
+
 
 
 //    @Override

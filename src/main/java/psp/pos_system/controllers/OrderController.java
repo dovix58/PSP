@@ -57,8 +57,8 @@ public class OrderController {
         List<OrderProductsResponse> products = orderService.getProductsByOrderId(orderId);
         return ResponseEntity.ok(products);
     }
-    @GetMapping("/{orderId}")
+    @GetMapping("/{orderId}/totalPrice")
     public ResponseEntity<BigInteger> getOrderPrice(@PathVariable UUID orderId){
-        return new ResponseEntity<>(orderService.calculateOrderPrice, HttpStatus.OK);
+        return new ResponseEntity<>(orderService.calculateOrderPrice(orderId), HttpStatus.OK);
     }
 }

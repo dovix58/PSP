@@ -8,6 +8,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [products, setProducts] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isModalOpen, setModalOpen] = useState(false);
+    const [totalPrice, setTotalPrice] = useState(0);
 
     // Fetch orders from backend API
     const fetchOrders = async () => {
@@ -46,6 +47,29 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
 
         fetchProductsFromOrders();
     }, [selectedOrder]); // Only re-run if selectedOrder changes
+
+    useEffect(() => {
+        if (!selectedOrder) return;
+
+        const fetchOrderDetails = async () => {
+            try {
+                const response = await fetch(`/api/v1/orders/${selectedOrder.id}/totalPrice`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch total price: ${response.statusText}`);
+                }
+
+                const data = await response.json(); // Assuming the total price is returned directly
+                console.log(data)
+                setTotalPrice(data/ 100); // Convert from cents to dollars
+            } catch (error) {
+                console.error('Error fetching total price:', error);
+                setTotalPrice(0);  // Reset on error
+            }
+
+        };
+
+        fetchOrderDetails();
+    }, [selectedOrder]);  // Run when selectedOrder changes
 
     const formatDate = (isoDate: string): string => {
         const date = new Date(isoDate);
@@ -216,9 +240,8 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
 
                             </Box>
                             <Box display="flex" justifyContent="flex-end" mt={1}>
-                                <Typography>
-                                    Total Price:
-                                </Typography>
+
+                                <Typography variant="h6">Total Price: ${totalPrice}</Typography>
                             </Box>
                         </Box>
                     ) : (
