@@ -1,28 +1,30 @@
-import {Box, List, ListItem, ListItemText, Modal, Paper, Typography} from "@mui/material";
+import {Box, Button, IconButton, List, ListItem, ListItemText, Modal, Paper, Tooltip, Typography} from "@mui/material";
+import CancelIcon from '@mui/icons-material/Cancel';
 import {useEffect, useState} from "react";
+import {red} from "@mui/material/colors";
 
-export default function OrderList() {
+export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [orders, setOrders] = useState([]);
     const [products, setProducts] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isModalOpen, setModalOpen] = useState(false);
 
     // Fetch orders from backend API
-    useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await fetch('/api/v1/orders');
-                if (!response.ok) throw new Error('Failed to fetch orders');
-                const data = await response.json();
-                setOrders(data);
-            } catch (err) {
-                // If an error occurs, treat it as no orders
-                setOrders([]);
-            }
-        };
+    const fetchOrders = async () => {
+        try {
+            const response = await fetch('/api/v1/orders'); // Replace with your API endpoint
+            const data = await response.json();
+            setOrders(data);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        }
+    };
 
+    // Fetch orders on component mount and whenever refreshOrders changes
+    useEffect(() => {
+        console.log('Fetching orders, refreshOrders changed:', refreshOrders);
         fetchOrders();
-    }, []);
+    }, [refreshOrders]);
 
 
     useEffect(() => {
@@ -62,6 +64,29 @@ export default function OrderList() {
         setModalOpen(false);
         setSelectedOrder(null);
     };
+    const handleCancelOrder = async () => {
+        try {
+            const response = await fetch(`/api/v1/orders/${selectedOrder.id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                // Handle server errors or invalid responses
+                throw new Error(`Error: ${response.statusText}`);
+            }
+            onOrderDeletion();
+            alert('Order Delted Succesfully!');
+            handleCloseModal(); // Close the modal
+
+            // Process the response (e.g., update UI or state)
+            console.log('Order canceled successfully');
+            // You might want to update your state or trigger a UI update here
+
+        } catch (error) {
+            // Handle network or unexpected errors
+            console.error('Failed to cancel order:', error);
+        }
+    };
 
     return (
         <Box
@@ -71,6 +96,7 @@ export default function OrderList() {
                 padding: "8px",
                 margin: "8px 0",
                 maxHeight: 400,
+                width: 400,
                 overflowY: "auto"
             }}
         >
@@ -108,6 +134,7 @@ export default function OrderList() {
                 aria-labelledby="order-details-title"
                 aria-describedby="order-details-description"
             >
+
                 <Paper
                     sx={{
                         position: 'absolute',
@@ -115,13 +142,36 @@ export default function OrderList() {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         padding: '16px',
-                        minWidth: '300px',
+                        minWidth: '400px',
                         maxWidth: '500px',
+                        height: '400px'
                     }}
                 >
-                    <Typography id="order-details-title" variant="h6" gutterBottom>
-                        Order Details
-                    </Typography>
+                    <Box
+                        display="flex"
+                        justifyContent="space-between"
+                    >
+                        <Typography id="order-details-title" variant="h6" gutterBottom>
+                            Order Details
+                        </Typography>
+                        <Tooltip title="Cancel Order">
+                            <IconButton
+                                sx={{
+                                    backgroundColor: 'white', // Red background color
+                                    color: 'red', // White color for the 'X'
+                                    borderRadius: '50%', // Make the button round
+                                    width: 35, // Button width
+                                    height: 35, // Button height
+                                    top: -7,
+                                }}
+                                onClick={handleCancelOrder}
+                            >
+                                <CancelIcon />
+                            </IconButton>
+                        </Tooltip>
+
+                    </Box>
+
                     {selectedOrder ? (
                         <Box>
                             <Typography id="order-details-description" variant="body1">
@@ -133,6 +183,7 @@ export default function OrderList() {
                             <Typography variant="body1">
                                 <strong>Status:</strong> {selectedOrder.orderStatus}
                             </Typography>
+                            <Box sx={{ maxHeight: 160, overflowY: "auto" }}>
                                 <List>
                                     {products.map((product, index) => (
                                         <ListItem
@@ -145,16 +196,35 @@ export default function OrderList() {
                                                 },
                                             }}
                                         >
-                                            {product.name}
+                                            <Box display="flex" justifyContent="flex-end" width="100%" flexDirection="column">
+                                                <Typography>
+                                                    Product: {product.name}
+                                                </Typography>
+                                                <Box ml="auto" display="flex" gap={2}>
+                                                    <Typography>
+                                                        Amount: {product.quantity}
+                                                    </Typography>
+                                                    <Typography>
+                                                        {product.price / 100}$
+                                                    </Typography>
+                                                </Box>
+
+                                            </Box>
                                         </ListItem>
                                     ))}
                                 </List>
+
+                            </Box>
+                            <Box display="flex" justifyContent="flex-end" mt={1}>
+                                <Typography>
+                                    Total Price:
+                                </Typography>
+                            </Box>
                         </Box>
                     ) : (
                         <Typography variant="body1">No order selected.</Typography>
                     )}
                 </Paper>
-
             </Modal>
         </Box>
     );

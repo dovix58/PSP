@@ -5,24 +5,25 @@ import OrderList from "./OrderList";
 
 // Main component that will render MyComponent and the list of items
 export default function CateringPage() {
+    const [refreshOrders, setRefreshOrders] = useState(false);
 
-    useEffect(() => {
-
-    }, []);
+    const handleOrderAdded = () => {
+        setRefreshOrders((prev) => !prev);
+    };
 
     return (
         <Box
             sx={{
                 display: 'flex',
-                flexDirection: 'column', // Stack boxes vertically
-                alignItems: 'center', // Center horizontally
-                justifyContent: 'center', // Center vertically
-                height: '100vh', // Full viewport height
-                gap: 2, // Space between the boxes
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100vh',
+                gap: 2,
             }}
         >
-            <OrderList/>
-            <CreateOrder/>
+            <OrderList refreshOrders={refreshOrders} onOrderDeletion={handleOrderAdded} />
+            <CreateOrder onOrderAdded={handleOrderAdded} />
         </Box>
     );
-};
+}

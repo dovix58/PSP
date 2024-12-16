@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import psp.pos_system.models.DTO.CreateOrderRequest;
+import psp.pos_system.models.DTO.OrderProductsResponse;
 import psp.pos_system.models.Order;
-import psp.pos_system.models.Product;
 import psp.pos_system.services.OrderService;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,8 +53,12 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}/products")
-    public ResponseEntity<List<Product>> getProductsByOrder(@PathVariable UUID orderId) {
-        List<Product> products = orderService.getProductsByOrderId(orderId);
+    public ResponseEntity<List<OrderProductsResponse>> getProductsByOrder(@PathVariable UUID orderId) {
+        List<OrderProductsResponse> products = orderService.getProductsByOrderId(orderId);
         return ResponseEntity.ok(products);
+    }
+    @GetMapping("/{orderId}")
+    public ResponseEntity<BigInteger> getOrderPrice(@PathVariable UUID orderId){
+        return new ResponseEntity<>(orderService.calculateOrderPrice, HttpStatus.OK);
     }
 }

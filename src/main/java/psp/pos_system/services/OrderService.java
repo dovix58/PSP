@@ -1,11 +1,10 @@
 package psp.pos_system.services;
 
-import org.aspectj.weaver.ast.Or;
+import psp.pos_system.models.DTO.OrderProductsResponse;
 import psp.pos_system.models.Order;
-import psp.pos_system.models.Product;
 
+import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface OrderService {
@@ -18,7 +17,9 @@ public interface OrderService {
 
     void deleteOrderById(UUID id);
 
-    List<Product> getProductsByOrderId(UUID orderId);
+    List<OrderProductsResponse> getProductsByOrderId(UUID orderId);
+
+    BigInteger calculateOrderPrice(UUID orderId);
 
 //    Or updateOrder(UUID id);
 }

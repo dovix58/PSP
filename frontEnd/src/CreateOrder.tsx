@@ -16,7 +16,7 @@ import {ReactNode, useEffect, useState} from "react";
 import {getAllProducts} from "./api/productAPI";
 
 
-export default function CreateOrder(){
+export default function CreateOrder({onOrderAdded}){
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState([]);
 
@@ -79,6 +79,7 @@ export default function CreateOrder(){
                 throw new Error('Failed to create order');
             }
 
+            onOrderAdded();
             const createOrderData = await createOrderResponse.json();
             const orderId = createOrderData.id; // Assuming the orderId is returned
 
