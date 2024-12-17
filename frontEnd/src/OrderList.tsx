@@ -1,4 +1,16 @@
-import {Box, Button, IconButton, List, ListItem, ListItemText, Modal, Paper, Tooltip, Typography} from "@mui/material";
+import {
+    Box,
+    Button,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    Modal,
+    Paper,
+    TextField,
+    Tooltip,
+    Typography
+} from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
 import {useEffect, useState} from "react";
 import {red} from "@mui/material/colors";
@@ -9,6 +21,8 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isModalOpen, setModalOpen] = useState(false);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
+    const [selectedOrderProduct, setSelectedOrderProduct] = useState([]);
 
     // Fetch orders from backend API
     const fetchOrders = async () => {
@@ -88,6 +102,15 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
         setModalOpen(false);
         setSelectedOrder(null);
     };
+
+    const handleCloseEditModal = () => {
+        setEditModalOpen(false);
+
+    }
+    const handleOpenEditModal = (product) =>{
+        setSelectedOrderProduct(product);
+        setEditModalOpen(true);
+    }
     const handleCancelOrder = async () => {
         try {
             const response = await fetch(`/api/v1/orders/${selectedOrder.id}`, {
@@ -111,6 +134,19 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
             console.error('Failed to cancel order:', error);
         }
     };
+
+    const handleOrderProductUpdate = async (index, productId, value) => {
+        const response = await fetch(`/api/v1/orders/${selectedOrder.id}/products/${productId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                quantity: value,
+            }),
+        });
+        onOrderDeletion();
+    }
 
     return (
         <Box
@@ -166,32 +202,33 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         padding: '16px',
-                        minWidth: '400px',
-                        maxWidth: '500px',
+                        minWidth: '500px',
+                        maxWidth: '800px',
                         height: '400px'
                     }}
                 >
                     <Box
                         display="flex"
                         justifyContent="space-between"
+
                     >
                         <Typography id="order-details-title" variant="h6" gutterBottom>
                             Order Details
                         </Typography>
                         <Tooltip title="Cancel Order">
-                            <IconButton
+                            <Button
                                 sx={{
-                                    backgroundColor: 'white', // Red background color
-                                    color: 'red', // White color for the 'X'
-                                    borderRadius: '50%', // Make the button round
+                                    backgroundColor: 'darkred', // Red background color
+                                    color: 'white', // White color for the 'X'
+                                     // Make the button round
                                     width: 35, // Button width
                                     height: 35, // Button height
                                     top: -7,
                                 }}
                                 onClick={handleCancelOrder}
                             >
-                                <CancelIcon />
-                            </IconButton>
+                                Cancel
+                            </Button>
                         </Tooltip>
 
                     </Box>
@@ -207,23 +244,24 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                             <Typography variant="body1">
                                 <strong>Status:</strong> {selectedOrder.orderStatus}
                             </Typography>
-                            <Box sx={{ maxHeight: 160, overflowY: "auto" }}>
+                            <Box sx={{ maxHeight: 160, overflowY: "auto",  border: '1px solid #000', }}>
                                 <List>
                                     {products.map((product, index) => (
                                         <ListItem
                                             key={index}
                                             divider
-                                            sx={{
-                                                '&:hover': {
-                                                    backgroundColor: 'limegreen',
-                                                    cursor: 'pointer',
-                                                },
-                                            }}
+
                                         >
                                             <Box display="flex" justifyContent="flex-end" width="100%" flexDirection="column">
                                                 <Typography>
                                                     Product: {product.name}
                                                 </Typography>
+                                                <Button
+                                                    sx={{ width: 4, backgroundColor: 'gray', color: 'black' }}
+                                                onClick={() => handleOpenEditModal(product)}>
+                                                    Edit
+                                                </Button>
+
                                                 <Box ml="auto" display="flex" gap={2}>
                                                     <Typography>
                                                         Amount: {product.quantity}
@@ -247,6 +285,30 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                     ) : (
                         <Typography variant="body1">No order selected.</Typography>
                     )}
+                </Paper>
+            </Modal>
+            {/* Edit Product Modal */}
+            <Modal
+                open={isEditModalOpen}
+                onClose={handleCloseEditModal}
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        padding: '16px',
+                        minWidth: '300px',
+                        maxWidth: '500px',
+                    }}
+                >
+                    <Typography variant="h6">Edit Product</Typography>
+                    <TextField label="Product Quantity" fullWidth margin="normal" />
+                    <Box display="flex" justifyContent="flex-end" mt={2}>
+                        <Button onClick={handleCloseEditModal}>Cancel</Button>
+                        <Button sx={{ ml: 1 }} variant="contained" color="primary">Save</Button>
+                    </Box>
                 </Paper>
             </Modal>
         </Box>
