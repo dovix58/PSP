@@ -3,8 +3,8 @@ package psp.pos_system.controllers.Reservation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import psp.pos_system.controllers.Reservation.DTOs.ReservationCreateDTO;
-import psp.pos_system.controllers.Reservation.Mappers.ReservationCreateMapper;
+import psp.pos_system.dtos.reservation.ReservationCreateDTO;
+import psp.pos_system.dtosMappers.reservation.ReservationCreateMapper;
 import psp.pos_system.models.Reservation;
 
 @RestController
