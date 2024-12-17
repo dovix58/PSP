@@ -2,13 +2,14 @@ package psp.pos_system.services.Implementation;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import psp.pos_system.models.DTO.OrderProductsResponse;
 import psp.pos_system.models.Order;
 import psp.pos_system.models.OrderProduct;
-import psp.pos_system.models.Product;
 import psp.pos_system.models.enums.OrderStatus;
 import psp.pos_system.repositories.OrderRepo;
 import psp.pos_system.services.OrderService;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -49,20 +50,40 @@ public class OrderServiceImpl implements OrderService {
         orderRepo.deleteById(id);
     }
 
-    public List<Product> getProductsByOrderId(UUID orderId) {
+    public List<OrderProductsResponse> getProductsByOrderId(UUID orderId) {
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-
         Set<OrderProduct> orderProducts = order.getProducts();
         System.out.println(orderProducts);
-        List<Product> products = orderProducts.stream()
-                .map(OrderProduct::getProduct)
-                .collect(Collectors.toList());
-        System.out.println(products);
-        return products;
 
+        List<OrderProductsResponse> orderProductsResponses = orderProducts.stream()
+                .map(orderProduct -> {
+                    OrderProductsResponse response = new OrderProductsResponse();
+                    response.setName(orderProduct.getProduct().getName());  // Assuming `getProduct()` gives you the Product
+                    response.setQuantity(orderProduct.getQuantity());
+                    response.setPrice(orderProduct.getPrice());// Assuming `getQuantity()` gives you the quantity
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        return orderProductsResponses;
     }
+
+    @Override
+    public BigInteger calculateOrderPrice(UUID orderId) {
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        Set<OrderProduct> orderProducts = order.getProducts();
+        BigInteger totalPrice = BigInteger.ZERO;
+        for (var orderproduct: orderProducts){
+            totalPrice = totalPrice.add(orderproduct.getPrice());
+        }
+        return totalPrice;
+    }
+
+
 
 
 //    @Override

@@ -1,6 +1,5 @@
 import React, {useState} from 'react'
 import {Box, Button} from "@mui/material"
-import './App.css'
 import {getAllProducts} from "./api/productAPI.ts";
 import {Product} from "./api/entityInterfaces.ts";
 
