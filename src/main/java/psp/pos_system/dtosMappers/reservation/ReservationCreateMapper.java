@@ -1,7 +1,7 @@
-package psp.pos_system.controllers.Reservation.Mappers;
+package psp.pos_system.dtosMappers.reservation;
 
 import org.springframework.stereotype.Component;
-import psp.pos_system.controllers.Reservation.DTOs.ReservationCreateDTO;
+import psp.pos_system.dtos.reservation.ReservationCreateDTO;
 import psp.pos_system.models.Reservation;
 
 import java.time.LocalDateTime;
@@ -12,7 +12,7 @@ public class ReservationCreateMapper {
     public Reservation toEntity(ReservationCreateDTO dto) {
         if(dto == null) return null;
         Reservation reservation = new Reservation();
-        reservation.setBussinesId(dto.getBussinesId());
+        reservation.setBusinessId(dto.getBusinessId());
         reservation.setUserId(dto.getUserId());
         reservation.setCustomer(dto.getCustomer());
         reservation.setNote(dto.getNote());

@@ -1,18 +1,18 @@
-package psp.pos_system.controllers.Reservation.DTOs;
+package psp.pos_system.dtos.reservation;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ReservationCreateDTO {
-    private UUID bussinesId;
+    private UUID businessId;
     private UUID userId;
     private String customer; // Customer's name
     private String note; //Reservation note
     private LocalDateTime appointmentTime;
 
     // Getters
-    public UUID getBussinesId() {
-        return bussinesId;
+    public UUID getBusinessId() {
+        return businessId;
     }
 
     public UUID getUserId() {
@@ -33,7 +33,7 @@ public class ReservationCreateDTO {
 
     // Setters
     public void setBussinesId(UUID bussinesId) {
-        this.bussinesId = bussinesId;
+        this.businessId = bussinesId;
     }
 
     public void setUserId(UUID userId) {
