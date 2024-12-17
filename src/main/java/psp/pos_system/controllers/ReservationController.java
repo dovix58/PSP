@@ -43,9 +43,11 @@ public class ReservationController {
         return new ResponseEntity<>(reservationService.getReservationById(id), HttpStatus.OK);
     }
 
+    //Reikes dar igyvendint Put metoda
+
     @DeleteMapping
-    public ResponseEntity<?> deleteReservation(UUID id) {
+    public ResponseEntity deleteReservation(UUID id) {
         reservationService.deleteReservation(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
