@@ -20,3 +20,65 @@ export function getAllProducts(): Promise<Product[]> {
             return res as Product[]
         })
 }
+
+export function createProduct(name, price): Promise<Product> {
+    const headers: Headers = new Headers()
+
+    headers.set('Content-Type', 'application/json')
+    headers.set('Accept', 'application/json')
+
+    const request: RequestInfo = new Request('/api/v1/products', {
+        method: 'POST',
+        body: JSON.stringify({
+            name: name,
+            price: price
+        }),
+        headers: headers
+    })
+
+    return fetch(request)
+        .then(res => res.json())
+        .then(res => {
+            return res as Product
+        })
+}
+
+export function updateProduct(id, name, price): Promise<Product> {
+    const headers: Headers = new Headers()
+
+    headers.set('Content-Type', 'application/json')
+    headers.set('Accept', 'application/json')
+
+    const request: RequestInfo = new Request(`/api/v1/products/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            name: name,
+            price: price
+        }),
+        headers: headers
+    })
+
+    return fetch(request)
+        .then(res => res.json())
+        .then(res => {
+            return res as Product
+        })
+}
+
+export function deleteProduct(id): Promise<Product> {
+    const headers: Headers = new Headers()
+
+    headers.set('Content-Type', 'application/json')
+    headers.set('Accept', 'application/json')
+
+    const request: RequestInfo = new Request(`/api/v1/products/${id}`, {
+        method: 'DELETE',
+        headers: headers
+    })
+
+    return fetch(request)
+        .then(res => res.json())
+        .then(res => {
+            return res as Product
+        })
+}

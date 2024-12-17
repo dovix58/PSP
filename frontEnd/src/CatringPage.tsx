@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Grid, Typography, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
 import CreateOrder from "./CreateOrder";
 import OrderList from "./OrderList";
+import CreateProduct from "./CreateProduct.tsx";
 
 // Main component that will render MyComponent and the list of items
 export default function CateringPage() {
@@ -22,6 +23,7 @@ export default function CateringPage() {
                 gap: 2,
             }}
         >
+            <CreateProduct />
             <OrderList refreshOrders={refreshOrders} onOrderDeletion={handleOrderAdded} />
             <CreateOrder onOrderAdded={handleOrderAdded} />
         </Box>
