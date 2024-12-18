@@ -1,52 +1,55 @@
 package psp.pos_system.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+
 @Entity
 @Getter
 @Setter
-@Table(name = "products")
+@Table(name = "taxes")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Product {
+
+public class Tax {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
-    private ProductCategory categoryId;
-
     @Column(nullable = false)
     private String name;
 
-    //Kaina saugoma centais
     @Column(nullable = false)
-    private int price;
+    private String country;
 
-    // Laikai saugomi UTC laiko zona
+    @Column(nullable = false)
+    private int taxRate;
+
     @Column(nullable = false)
     private Timestamp created;
 
+    @Column
     private Timestamp updated;
 
     @JsonBackReference
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "product")
-    Set<OrderProduct> orders = new HashSet<>();
+    @OneToMany(mappedBy = "tax")
+    Set<ProductCategoryTax> categories = new HashSet<>();
+
+
 }

@@ -1,4 +1,4 @@
-package psp.pos_system.services.implementation;
+package psp.pos_system.services.Implementation;
 
 import org.springframework.stereotype.Service;
 import psp.pos_system.models.Product;
