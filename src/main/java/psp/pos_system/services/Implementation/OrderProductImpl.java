@@ -75,6 +75,11 @@ public class OrderProductImpl implements OrderProductService {
         OrderProduct orderProduct =  orderProductRepo.findById(key)
                 .orElseThrow(() -> new IllegalArgumentException("OrderProduct not found for orderId: " + orderId + ", productId: " + productId));
         orderProduct.setQuantity(updateOrderProductRequest.getQuantity());
+
+        BigInteger bigPrice = BigInteger.valueOf(orderProduct.getProduct().getPrice());
+        BigInteger bigQuantity = BigInteger.valueOf(updateOrderProductRequest.getQuantity());
+
+        orderProduct.setPrice(bigPrice.multiply(bigQuantity));
         return orderProductRepo.save(orderProduct);
 
 
