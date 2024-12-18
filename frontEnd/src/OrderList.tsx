@@ -23,6 +23,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [totalPrice, setTotalPrice] = useState(0);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [selectedOrderProduct, setSelectedOrderProduct] = useState([]);
+    const [editValue, setEditValue] = useState("");
 
     // Fetch orders from backend API
     const fetchOrders = async () => {
@@ -41,46 +42,47 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
         fetchOrders();
     }, [refreshOrders]);
 
+    const fetchProductsFromOrders = async () => {
+        if (!selectedOrder) return; // Ensure there's a selected order before fetching
 
-    useEffect(() => {
-        const fetchProductsFromOrders = async () => {
-            if (!selectedOrder) return; // Ensure there's a selected order before fetching
-
-            try {
-                const response = await fetch(`/api/v1/orders/${selectedOrder.id}/products`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json(); // Parse the JSON response
-                setProducts(data); // Update state with the fetched products
-            } catch (err) {
-                console.error("Failed to fetch products:", err);
-                setProducts([]); // Clear products on error
+        try {
+            const response = await fetch(`/api/v1/orders/${selectedOrder.id}/products`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        };
+            const data = await response.json(); // Parse the JSON response
+            setProducts(data); // Update state with the fetched products
+        } catch (err) {
+            console.error("Failed to fetch products:", err);
+            setProducts([]); // Clear products on error
+        }
+    };
+    useEffect(() => {
+
 
         fetchProductsFromOrders();
     }, [selectedOrder]); // Only re-run if selectedOrder changes
 
+    const fetchOrderDetails = async () => {
+        try {
+            const response = await fetch(`/api/v1/orders/${selectedOrder.id}/totalPrice`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch total price: ${response.statusText}`);
+            }
+
+            const data = await response.json(); // Assuming the total price is returned directly
+            console.log(data)
+            setTotalPrice(data/ 100); // Convert from cents to dollars
+        } catch (error) {
+            console.error('Error fetching total price:', error);
+            setTotalPrice(0);  // Reset on error
+        }
+
+    };
     useEffect(() => {
         if (!selectedOrder) return;
 
-        const fetchOrderDetails = async () => {
-            try {
-                const response = await fetch(`/api/v1/orders/${selectedOrder.id}/totalPrice`);
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch total price: ${response.statusText}`);
-                }
 
-                const data = await response.json(); // Assuming the total price is returned directly
-                console.log(data)
-                setTotalPrice(data/ 100); // Convert from cents to dollars
-            } catch (error) {
-                console.error('Error fetching total price:', error);
-                setTotalPrice(0);  // Reset on error
-            }
-
-        };
 
         fetchOrderDetails();
     }, [selectedOrder]);  // Run when selectedOrder changes
@@ -111,6 +113,11 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
         setSelectedOrderProduct(product);
         setEditModalOpen(true);
     }
+    const handleEditInputChange = (event) => {
+        setEditValue(event.target.value);
+
+    };
+
     const handleCancelOrder = async () => {
         try {
             const response = await fetch(`/api/v1/orders/${selectedOrder.id}`, {
@@ -118,34 +125,65 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
             });
 
             if (!response.ok) {
-                // Handle server errors or invalid responses
                 throw new Error(`Error: ${response.statusText}`);
             }
             onOrderDeletion();
             alert('Order Delted Succesfully!');
             handleCloseModal(); // Close the modal
 
-            // Process the response (e.g., update UI or state)
             console.log('Order canceled successfully');
-            // You might want to update your state or trigger a UI update here
 
         } catch (error) {
-            // Handle network or unexpected errors
             console.error('Failed to cancel order:', error);
         }
     };
 
-    const handleOrderProductUpdate = async (index, productId, value) => {
-        const response = await fetch(`/api/v1/orders/${selectedOrder.id}/products/${productId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                quantity: value,
-            }),
-        });
-        onOrderDeletion();
+    const handleSaveEdit = async () => {
+        try {
+            console.log(selectedOrder.id);
+            console.log(selectedOrderProduct.id);
+            const response = await fetch(`/api/v1/orders/${selectedOrder.id}/products/${selectedOrderProduct.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    quantity: editValue, // Use the updated value
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to update product: ${response.statusText}`);
+            }
+
+            alert("Product updated successfully!");
+            setEditModalOpen(false); // Close the edit modal
+            await fetchOrderDetails();
+            await fetchOrders(); // Refresh orders to reflect the updated value
+            await fetchProductsFromOrders();
+        } catch (error) {
+            console.error("Error updating product:", error);
+        }
+    };
+
+    const handleDeleteOrderProduct = async (id) => {
+        try {
+            const response = await fetch(`/api/v1/orders/${selectedOrder.id}/products/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+            setSelectedOrderProduct([]);
+            await fetchProductsFromOrders();
+            await fetchOrderDetails();
+
+            console.log('Order canceled successfully');
+
+        } catch (error) {
+            console.error('Failed to cancel order:', error);
+        }
     }
 
     return (
@@ -256,12 +294,18 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                                                 <Typography>
                                                     Product: {product.name}
                                                 </Typography>
-                                                <Button
-                                                    sx={{ width: 4, backgroundColor: 'gray', color: 'black' }}
-                                                onClick={() => handleOpenEditModal(product)}>
-                                                    Edit
-                                                </Button>
-
+                                                <Box display="flex">
+                                                    <Button
+                                                        sx={{ width: 4, backgroundColor: 'gray', color: 'black' }}
+                                                        onClick={() => handleOpenEditModal(product)}>
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        sx={{ width: 4, backgroundColor: 'red', color: 'white' }}
+                                                        onClick={() => handleDeleteOrderProduct(product.id)}>
+                                                        delete
+                                                    </Button>
+                                                </Box>
                                                 <Box ml="auto" display="flex" gap={2}>
                                                     <Typography>
                                                         Amount: {product.quantity}
@@ -304,10 +348,23 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                     }}
                 >
                     <Typography variant="h6">Edit Product</Typography>
-                    <TextField label="Product Quantity" fullWidth margin="normal" />
+                    <TextField
+                        label={`Current amount: ${selectedOrderProduct.quantity}`}
+                        fullWidth
+                        margin="normal"
+                        value={editValue} // Bind the state to the input field
+                        onChange={handleEditInputChange} // Update state on input change
+                    />
                     <Box display="flex" justifyContent="flex-end" mt={2}>
                         <Button onClick={handleCloseEditModal}>Cancel</Button>
-                        <Button sx={{ ml: 1 }} variant="contained" color="primary">Save</Button>
+                        <Button
+                            sx={{ ml: 1 }}
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSaveEdit} // Call the save function on click
+                        >
+                            Save
+                        </Button>
                     </Box>
                 </Paper>
             </Modal>

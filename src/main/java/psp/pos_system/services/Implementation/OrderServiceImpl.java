@@ -60,6 +60,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderProductsResponse> orderProductsResponses = orderProducts.stream()
                 .map(orderProduct -> {
                     OrderProductsResponse response = new OrderProductsResponse();
+                    response.setId(orderProduct.getProduct().getId());
                     response.setName(orderProduct.getProduct().getName());  // Assuming `getProduct()` gives you the Product
                     response.setQuantity(orderProduct.getQuantity());
                     response.setPrice(orderProduct.getPrice());// Assuming `getQuantity()` gives you the quantity
