@@ -1,7 +1,7 @@
 import {Box, Button, IconButton, List, ListItem, ListItemText, Modal, Paper, Tooltip, Typography} from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
 import {useEffect, useState} from "react";
-import {red} from "@mui/material/colors";
+import PaymentModal from "./PaymentModal.tsx";
 
 export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [orders, setOrders] = useState([]);
@@ -9,6 +9,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isModalOpen, setModalOpen] = useState(false);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
 
     // Fetch orders from backend API
     const fetchOrders = async () => {
@@ -60,7 +61,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
 
                 const data = await response.json(); // Assuming the total price is returned directly
                 console.log(data)
-                setTotalPrice(data/ 100); // Convert from cents to dollars
+                setTotalPrice(data); // Convert from cents to dollars
             } catch (error) {
                 console.error('Error fetching total price:', error);
                 setTotalPrice(0);  // Reset on error
@@ -87,6 +88,16 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     const handleCloseModal = () => {
         setModalOpen(false);
         setSelectedOrder(null);
+    };
+    const handleOpenPaymentModal = () => {
+        setPaymentModalOpen(true);
+    };
+
+    const handleClosePaymentModal = () => {
+        setPaymentModalOpen(false);
+        setModalOpen(false);
+        setSelectedOrder(null);
+        onOrderDeletion();
     };
     const handleCancelOrder = async () => {
         try {
@@ -229,10 +240,12 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                                                         Amount: {product.quantity}
                                                     </Typography>
                                                     <Typography>
-                                                        {product.price / 100}$
+                                                        {new Intl.NumberFormat("en-US", {
+                                                            style: "currency",
+                                                            currency: "USD",
+                                                        }).format(product.price / 100)}
                                                     </Typography>
                                                 </Box>
-
                                             </Box>
                                         </ListItem>
                                     ))}
@@ -241,14 +254,35 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                             </Box>
                             <Box display="flex" justifyContent="flex-end" mt={1}>
 
-                                <Typography variant="h6">Total Price: ${totalPrice}</Typography>
+                                <Typography variant="h6">Total Price: {new Intl.NumberFormat("en-US", {
+                                    style: "currency",
+                                    currency: "USD",
+                                }).format(totalPrice / 100)}</Typography>
                             </Box>
+                            {selectedOrder.orderStatus === "OPEN" ? (
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleOpenPaymentModal}
+                                sx={{ mt: 2 }}
+                            >
+                                Pay for Order
+                            </Button>) : (<Typography variant="body1">Order paid</Typography>)}
                         </Box>
                     ) : (
                         <Typography variant="body1">No order selected.</Typography>
                     )}
                 </Paper>
             </Modal>
+            {selectedOrder && (
+                <PaymentModal
+                    isOpen={isPaymentModalOpen}
+                    onClose={handleClosePaymentModal}
+                    order={selectedOrder}
+                    products={products}
+                    totalPrice={totalPrice}
+                />
+            )}
         </Box>
     );
 }

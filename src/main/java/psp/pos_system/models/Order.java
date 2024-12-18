@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import psp.pos_system.models.enums.OrderStatus;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -37,19 +37,18 @@ public class Order {
     private UUID employeeId;
 
     @Column(nullable = false)
-    private LocalDateTime created;
+    private Timestamp created;
 
     @Column(nullable = true)
-    private LocalDateTime updated;
+    private Timestamp updated;
 
     @Column(nullable = true)
-    private LocalDateTime completed;
+    private Timestamp completed;
 
     @OneToMany(mappedBy = "order", orphanRemoval = true)
     @JsonBackReference
     @EqualsAndHashCode.Exclude
     Set<OrderProduct> products = new HashSet<>();
-
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;

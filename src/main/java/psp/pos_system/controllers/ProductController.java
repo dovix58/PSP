@@ -3,8 +3,9 @@ package psp.pos_system.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import psp.pos_system.models.DTO.UpdateProduct;
 import psp.pos_system.models.Product;
-import psp.pos_system.models.dtos.ProductDTO;
+import psp.pos_system.models.DTO.CreateProduct;
 import psp.pos_system.services.ProductService;
 
 import java.util.List;
@@ -20,8 +21,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody ProductDTO productDTO) {
-        return new ResponseEntity<>(productService.addProduct(productDTO.getName(), productDTO.getPrice()), HttpStatus.CREATED);
+    public ResponseEntity<Product> createProduct(@RequestBody CreateProduct createProduct) {
+        return new ResponseEntity<>(productService.addProduct(createProduct.getName(), createProduct.getPrice()), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -38,8 +39,8 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody ProductDTO productDTO) {
-        var result = productService.update(UUID.fromString(id), productDTO.getName(), productDTO.getPrice());
+    public ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody UpdateProduct updateProduct) {
+        var result = productService.update(UUID.fromString(id), updateProduct.getName(), updateProduct.getPrice());
         return result.map(product -> new ResponseEntity<>(product, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
