@@ -1,7 +1,5 @@
 package psp.pos_system.models.DTO;
 
-import java.sql.Timestamp;
-
 public class CreateProduct {
     public CreateProduct(String name, int price) {
         this.name = name;
