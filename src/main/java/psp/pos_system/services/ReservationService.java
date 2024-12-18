@@ -14,6 +14,8 @@ public interface ReservationService {
 
     Reservation getReservationById(UUID id);
 
+    Reservation updateReservation(UUID id, Reservation reservation);
+
     void deleteReservation(UUID id);
 
 }

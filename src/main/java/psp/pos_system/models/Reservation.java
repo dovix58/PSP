@@ -39,4 +39,15 @@ public class Reservation {
 
     @Column (nullable = false)
     private LocalDateTime appointmentTime;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
