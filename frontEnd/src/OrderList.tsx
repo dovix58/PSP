@@ -11,7 +11,6 @@ import {
     Tooltip,
     Typography
 } from "@mui/material";
-import CancelIcon from '@mui/icons-material/Cancel';
 import {useEffect, useState} from "react";
 import PaymentModal from "./PaymentModal.tsx";
 
@@ -264,22 +263,23 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                         <Typography id="order-details-title" variant="h6" gutterBottom>
                             Order Details
                         </Typography>
-                        <Tooltip title="Cancel Order">
-                            <Button
-                                sx={{
-                                    backgroundColor: 'darkred', // Red background color
-                                    color: 'white', // White color for the 'X'
-                                     // Make the button round
-                                    width: 35, // Button width
-                                    height: 35, // Button height
-                                    top: -7,
-                                }}
-                                onClick={handleCancelOrder}
-                            >
-                                Cancel
-                            </Button>
-                        </Tooltip>
-
+                        {selectedOrder && selectedOrder.orderStatus === "OPEN" && (
+                            <Tooltip title="Cancel Order">
+                                <Button
+                                    sx={{
+                                        backgroundColor: 'darkred', // Red background color
+                                        color: 'white', // White color for the 'X'
+                                         // Make the button round
+                                        width: 35, // Button width
+                                        height: 35, // Button height
+                                        top: -7,
+                                    }}
+                                    onClick={handleCancelOrder}
+                                >
+                                    Cancel
+                                </Button>
+                            </Tooltip>
+                        )}
                     </Box>
 
                     {selectedOrder ? (
@@ -293,34 +293,41 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                             <Typography variant="body1">
                                 <strong>Status:</strong> {selectedOrder.orderStatus}
                             </Typography>
-                            <Box sx={{ maxHeight: 160, overflowY: "auto",  border: '1px solid #000', }}>
+                            <Box
+                                sx={{
+                                    maxHeight: 160,
+                                    overflowY: "auto",
+                                    border: "1px solid #000",
+                                }}
+                            >
                                 <List>
                                     {products.map((product, index) => (
-                                        <ListItem
-                                            key={index}
-                                            divider
-
-                                        >
-                                            <Box display="flex" justifyContent="flex-end" width="100%" flexDirection="column">
-                                                <Typography>
-                                                    Product: {product.name}
-                                                </Typography>
-                                                <Box display="flex">
-                                                    <Button
-                                                        sx={{ width: 4, backgroundColor: 'gray', color: 'black' }}
-                                                        onClick={() => handleOpenEditModal(product)}>
-                                                        Edit
-                                                    </Button>
-                                                    <Button
-                                                        sx={{ width: 4, backgroundColor: 'red', color: 'white' }}
-                                                        onClick={() => handleDeleteOrderProduct(product.id)}>
-                                                        delete
-                                                    </Button>
-                                                </Box>
+                                        <ListItem key={index} divider>
+                                            <Box
+                                                display="flex"
+                                                justifyContent="flex-end"
+                                                width="100%"
+                                                flexDirection="column"
+                                            >
+                                                <Typography>Product: {product.name}</Typography>
+                                                {selectedOrder.orderStatus === "OPEN" && (
+                                                    <Box display="flex">
+                                                        <Button
+                                                            sx={{ width: 4, backgroundColor: "gray", color: "black" }}
+                                                            onClick={() => handleOpenEditModal(product)}
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                        <Button
+                                                            sx={{ width: 4, backgroundColor: "red", color: "white" }}
+                                                            onClick={() => handleDeleteOrderProduct(product.id)}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    </Box>
+                                                )}
                                                 <Box ml="auto" display="flex" gap={2}>
-                                                    <Typography>
-                                                        Amount: {product.quantity}
-                                                    </Typography>
+                                                    <Typography>Amount: {product.quantity}</Typography>
                                                     <Typography>
                                                         {new Intl.NumberFormat("en-US", {
                                                             style: "currency",
@@ -332,24 +339,28 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                                         </ListItem>
                                     ))}
                                 </List>
-
                             </Box>
                             <Box display="flex" justifyContent="flex-end" mt={1}>
-
-                                <Typography variant="h6">Total Price: {new Intl.NumberFormat("en-US", {
-                                    style: "currency",
-                                    currency: "USD",
-                                }).format(totalPrice / 100)}</Typography>
+                                <Typography variant="h6">
+                                    Total Price:{" "}
+                                    {new Intl.NumberFormat("en-US", {
+                                        style: "currency",
+                                        currency: "USD",
+                                    }).format(totalPrice / 100)}
+                                </Typography>
                             </Box>
                             {selectedOrder.orderStatus === "OPEN" ? (
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleOpenPaymentModal}
-                                sx={{ mt: 2 }}
-                            >
-                                Pay for Order
-                            </Button>) : (<Typography variant="body1">Order paid</Typography>)}
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleOpenPaymentModal}
+                                    sx={{ mt: 2 }}
+                                >
+                                    Pay for Order
+                                </Button>
+                            ) : (
+                                <Typography variant="body1">Order paid</Typography>
+                            )}
                         </Box>
                     ) : (
                         <Typography variant="body1">No order selected.</Typography>
@@ -394,6 +405,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                 </Paper>
             </Modal>
             {selectedOrder && (
+
                 <PaymentModal
                     isOpen={isPaymentModalOpen}
                     onClose={handleClosePaymentModal}

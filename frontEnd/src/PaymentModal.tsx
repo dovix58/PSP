@@ -62,7 +62,7 @@ export default function PaymentModal({ isOpen, onClose, order, products, totalPr
                             Pay by Cash
                         </Button>
                         <Typography variant="subtitle1" gutterBottom>
-                            Or pay by card:
+                            Pay by card:
                         </Typography>
                         <TextField
                             label="Card Number"
@@ -86,9 +86,29 @@ export default function PaymentModal({ isOpen, onClose, order, products, totalPr
                             variant="contained"
                             color="secondary"
                             fullWidth
+                            sx={{ mb: 2 }}
                             onClick={handlePay}
                         >
                             Pay by Card
+                        </Button>
+                        <Typography sx={{ mb: 2 }} variant="subtitle1" gutterBottom>
+                            Pay by gift card:
+                        </Typography>
+                        <Box>
+                            <TextField
+                                label="Gift card number"
+                                fullWidth
+                                sx={{ mb: 2 }}
+                                onChange={(e) => handleChange("cardNumber", e.target.value)}
+                            />
+                        </Box>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            onClick={handlePay}
+                        >
+                            Pay by gift card
                         </Button>
                     </Box>
                 )}
