@@ -10,7 +10,8 @@ import psp.pos_system.repositories.OrderRepo;
 import psp.pos_system.services.OrderService;
 
 import java.math.BigInteger;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -35,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setEmployeeId(employeeId);
         order.setOrderStatus(OrderStatus.OPEN);
-        order.setCreated(LocalDateTime.now());
+        order.setCreated(Timestamp.from(Instant.now()));
         return orderRepo.save(order);
     }
 
@@ -83,14 +84,13 @@ public class OrderServiceImpl implements OrderService {
         }
         return totalPrice;
     }
-
-
-
-
-//    @Override
-//    public Or updateOrder(UUID id) {
-//        var orderToUpdate
-//    }
-
-
+    @Override
+    public Order closeOrder(UUID id) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+        order.setCompleted(Timestamp.from(Instant.now()));
+        order.setOrderStatus(OrderStatus.CLOSED);
+        orderRepo.save(order);
+        return order;
+    }
 }

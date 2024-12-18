@@ -1,9 +1,9 @@
-package psp.pos_system.models.dtos;
+package psp.pos_system.models.DTO;
 
 import java.sql.Timestamp;
 
-public class ProductDTO {
-    public ProductDTO(String name, int price) {
+public class UpdateProduct {
+    public UpdateProduct(String name, int price) {
         this.name = name;
         this.price = price;
     }
