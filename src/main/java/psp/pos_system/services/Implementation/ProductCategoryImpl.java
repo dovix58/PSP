@@ -27,8 +27,9 @@ public class ProductCategoryImpl implements ProductCategoryService{
         category.setName(name);
         category.setProductType(productType);
         category.setBusinessId(businessId);
-        category.setCreated(Timestamp.from(Instant.now()));
-        return productCategoryRepo.save(category);
+
+        productCategoryRepo.save(category);
+        return category;
     }
     
     @Override
@@ -46,7 +47,7 @@ public class ProductCategoryImpl implements ProductCategoryService{
     @Override
     public Optional<ProductCategory> getById(UUID id){
         var category = productCategoryRepo.findById(id);
-        
+
         return category;
     }
 
@@ -60,7 +61,6 @@ public class ProductCategoryImpl implements ProductCategoryService{
             category.setProductType(productType);
             category.setName(name);
             category.setBusinessId(businessId);
-            category.setUpdated(Timestamp.from(Instant.now()));
             productCategoryRepo.save(category);
         }
         return updatableCategory;

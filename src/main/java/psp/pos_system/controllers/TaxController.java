@@ -11,11 +11,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import psp.pos_system.services.TaxService;
 import psp.pos_system.models.Tax;
 import psp.pos_system.models.DTO.TaxDTO;
 
+@RestController
+@RequestMapping("/api/v1/taxes")
 public class TaxController {
     private final TaxService taxService;
 
@@ -24,7 +28,7 @@ public class TaxController {
     }
 
 
-    @PostMapping
+    @PostMapping(consumes = "application/json")
     public ResponseEntity<Tax> createTax(@RequestBody TaxDTO dto){
         var result = taxService.createTax(dto.getName(), dto.getCountry(), dto.getTaxRate());
         return new ResponseEntity<>(result, HttpStatus.OK);

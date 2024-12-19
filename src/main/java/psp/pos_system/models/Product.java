@@ -49,4 +49,6 @@ public class Product {
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "product")
     Set<OrderProduct> orders = new HashSet<>();
+
+    
 }

@@ -13,6 +13,4 @@ public class TaxDTO {
     String name;
     String country;
     int taxRate;
-    Timestamp created;
-    Timestamp updated;
 }

@@ -7,7 +7,6 @@ public class ProductCategoryDTO {
     String productType;
     String name;
     UUID businessId;
-    Timestamp created;
 
     public String getProductType() {
         return productType;
@@ -17,9 +16,6 @@ public class ProductCategoryDTO {
     }
     public UUID getBusinessId() {
         return businessId;
-    }
-    public Timestamp getCreated() {
-        return created;
     }
     
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.stereotype.Service;
+
 import psp.pos_system.models.ProductCategoryTax;
 import psp.pos_system.repositories.ProductCategoryRepo;
 import psp.pos_system.repositories.ProductRepo;
@@ -14,6 +16,7 @@ import psp.pos_system.repositories.TaxRepo;
 import psp.pos_system.repositories.ProductCategoryTaxRepo;
 import psp.pos_system.models.Tax;
 
+@Service
 public class TaxServiceImpl implements TaxService{
 
     private final TaxRepo taxRepo;
@@ -53,7 +56,6 @@ public class TaxServiceImpl implements TaxService{
             tax.setName(name);
             tax.setCountry(country);
             tax.setTaxRate(taxRate);
-            tax.setUpdated(Timestamp.from(Instant.now()));
             taxRepo.save(tax);
         }
         return updatableTax;

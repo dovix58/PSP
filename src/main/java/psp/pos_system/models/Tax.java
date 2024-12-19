@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -41,15 +42,27 @@ public class Tax {
     private int taxRate;
 
     @Column(nullable = false)
-    private Timestamp created;
+    private LocalDateTime created;
 
     @Column
-    private Timestamp updated;
+    private LocalDateTime updated;
 
     @JsonBackReference
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "tax")
     Set<ProductCategoryTax> categories = new HashSet<>();
+
+    
+    @PrePersist
+    protected void onCreate() {
+        created = LocalDateTime.now();
+        updated = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updated = LocalDateTime.now();
+    }
 
 
 }

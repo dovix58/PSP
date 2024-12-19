@@ -28,7 +28,7 @@ public class ProductCategoryController {
         this.productCategoryService = productCategoryService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = "application/json")
     public ResponseEntity <ProductCategory> createProductCategory(@RequestBody ProductCategoryDTO dto){
         return new ResponseEntity<>(productCategoryService.createProductCategory(dto.getProductType(), dto.getName(), dto.getBusinessId()), HttpStatus.CREATED);
     }
