@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import {useEffect, useState} from "react";
 import PaymentModal from "./PaymentModal.tsx";
+import {refundOrder} from "./api/OrderApi.ts";
 
 export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [orders, setOrders] = useState([]);
@@ -24,6 +25,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [selectedOrderProduct, setSelectedOrderProduct] = useState([]);
     const [editValue, setEditValue] = useState("");
     const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
+    const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
 
     // Fetch orders from backend API
     const fetchOrders = async () => {
@@ -196,6 +198,22 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
         }
     }
 
+    const handleOpenRefundModal = () => {
+        setIsRefundModalOpen(true);
+    };
+
+    const handleCloseRefundModal = () => {
+        setIsRefundModalOpen(false);
+        setModalOpen(false);
+        setSelectedOrder(null);
+        onOrderDeletion();
+    };
+
+    const handleRefund = () => {
+        refundOrder(selectedOrder.id)
+        handleOpenRefundModal();
+    }
+
     return (
         <Box
             sx={{
@@ -349,7 +367,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                                     }).format(totalPrice / 100)}
                                 </Typography>
                             </Box>
-                            {selectedOrder.orderStatus === "OPEN" ? (
+                            {selectedOrder.orderStatus === "OPEN" && (
                                 <Button
                                     variant="contained"
                                     color="primary"
@@ -358,13 +376,61 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                                 >
                                     Pay for Order
                                 </Button>
-                            ) : (
-                                <Typography variant="body1">Order paid</Typography>
+                            )}
+
+                            {selectedOrder.orderStatus === "CLOSED" && (
+                                <Box>
+                                    <Typography variant="body1">Order paid</Typography>
+                                    <Button
+                                        id="refundButton"
+                                        variant="contained"
+                                        color="primary"
+                                        sx={{ mt: 2 }}
+                                        onClick={handleRefund}
+                                    >
+                                        Refund
+                                    </Button>
+                                </Box>
                             )}
                         </Box>
                     ) : (
                         <Typography variant="body1">No order selected.</Typography>
                     )}
+                </Paper>
+            </Modal>
+            {/*Refund modal*/}
+            <Modal
+                open={isRefundModalOpen}
+                onClose={handleCloseRefundModal}
+                aria-labelledby="refund-success-title"
+                aria-describedby="refund-success-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        padding: '16px',
+                        minWidth: '300px',
+                    }}
+                >
+                    <Box display="flex" flexDirection="column" alignItems="center">
+                        <Typography id="refund-success-title" variant="h6" gutterBottom>
+                            Refund Successful
+                        </Typography>
+                        <Typography id="refund-success-description" variant="body1">
+                            The order has been successfully refunded.
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleCloseRefundModal}
+                            sx={{ mt: 2 }}
+                        >
+                            Close
+                        </Button>
+                    </Box>
                 </Paper>
             </Modal>
             {/* Edit Product Modal */}

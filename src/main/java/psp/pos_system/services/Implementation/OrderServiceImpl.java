@@ -88,8 +88,22 @@ public class OrderServiceImpl implements OrderService {
     public Order closeOrder(UUID id) {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+        if (order.getOrderStatus() != OrderStatus.OPEN)
+            throw new RuntimeException("Open order can not be refunded");
         order.setCompleted(Timestamp.from(Instant.now()));
         order.setOrderStatus(OrderStatus.CLOSED);
+        orderRepo.save(order);
+        return order;
+    }
+
+    @Override
+    public Order refundOrder(UUID id) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+        if (order.getOrderStatus() != OrderStatus.CLOSED)
+            throw new RuntimeException("Open order can not be refunded");
+        order.setOrderStatus(OrderStatus.REFUNDED);
+        order.setUpdated(Timestamp.from(Instant.now()));
         orderRepo.save(order);
         return order;
     }
