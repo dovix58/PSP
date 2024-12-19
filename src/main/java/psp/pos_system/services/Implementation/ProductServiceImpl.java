@@ -2,7 +2,9 @@ package psp.pos_system.services.Implementation;
 
 import org.springframework.stereotype.Service;
 import psp.pos_system.models.Product;
+import psp.pos_system.models.ProductCategory;
 import psp.pos_system.repositories.ProductRepo;
+import psp.pos_system.repositories.ProductCategoryRepo;
 import psp.pos_system.services.ProductService;
 
 import java.sql.Timestamp;
@@ -14,16 +16,23 @@ import java.util.UUID;
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepo productRepo;
-    public ProductServiceImpl(ProductRepo productRepo) {
+    private final ProductCategoryRepo categoryRepo;
+
+    public ProductServiceImpl(ProductRepo productRepo, ProductCategoryRepo categoryRepo) {
         this.productRepo = productRepo;
+        this.categoryRepo = categoryRepo;
     }
     @Override
-    public Product addProduct(String name, int price, int quantity) {
+    public Product addProduct(String name, int price, int quantity, UUID categoryId) {
+
+        ProductCategory category = categoryRepo.findById(categoryId)
+            .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + categoryId));
         Product product = Product.builder()
                 .name(name)
                 .price(price)
                 .quantity(quantity)
                 .created(Timestamp.from(Instant.now()))
+                .category(category)
                 .build();
         return productRepo.save(product);
     }

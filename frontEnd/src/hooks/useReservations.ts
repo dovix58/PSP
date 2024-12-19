@@ -26,7 +26,7 @@ export default function useReservations() {
   const getReservations = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/v1/reservations");
+      const response = await fetch("http://localhost:8081/api/v1/reservations");
       const data = await response.json();
       console.log("fetched data:", data);
       setReservations([...data]);

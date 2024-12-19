@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 @Entity
@@ -33,19 +34,18 @@ public class ProductCategory {
     private UUID id;
 
     @Column(nullable = false)
-    private String productType;
-
-    @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false)
-    private UUID businessId;
 
     @Column(nullable = false)
     private LocalDateTime created;
 
     @Column
     private LocalDateTime updated;
+
+    
+    @JsonManagedReference
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Product> products = new HashSet<>();
 
     @JsonBackReference
     @EqualsAndHashCode.Exclude
