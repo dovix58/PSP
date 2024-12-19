@@ -27,14 +27,19 @@ public class OrderController {
         return orderService.getAll();
     }
 
+    @CrossOrigin
     @PostMapping()
     public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest request){
         return new ResponseEntity<>(orderService.createOrder(request.getEmployeeId()), HttpStatus.CREATED);
     }
+
+    @CrossOrigin
     @GetMapping("/{id}")
     public ResponseEntity<Order> retrieveOrder(@PathVariable UUID id){
         return new ResponseEntity<>(orderService.getOrderById(id), HttpStatus.OK);
     }
+
+    @CrossOrigin
     @PutMapping("/{id}/close")
     public ResponseEntity<Order> closeOrder(@PathVariable UUID id){
         return new ResponseEntity<>(orderService.closeOrder(id), HttpStatus.OK);

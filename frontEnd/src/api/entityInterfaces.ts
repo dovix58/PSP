@@ -14,3 +14,11 @@ export interface Order {
     completed: string,
     orderStatus: string
 }
+
+export interface Category {
+    id: string;
+    name: string;
+    created: string;
+    updated: string;
+    products: any[];
+}

@@ -22,11 +22,9 @@ public class ProductCategoryImpl implements ProductCategoryService{
         this.productCategoryRepo = productCategoryRepo;
     }
     
-    public ProductCategory createProductCategory(String productType, String name, UUID businessId){
+    public ProductCategory createProductCategory(String name){
         ProductCategory category = new ProductCategory();
         category.setName(name);
-        category.setProductType(productType);
-        category.setBusinessId(businessId);
 
         productCategoryRepo.save(category);
         return category;
@@ -52,15 +50,13 @@ public class ProductCategoryImpl implements ProductCategoryService{
     }
 
     @Override
-    public Optional<ProductCategory> update(UUID id, String productType, String name, UUID businessId){
+    public Optional<ProductCategory> update(UUID id, String name){
 
         var updatableCategory = productCategoryRepo.findById(id);
 
         if (updatableCategory.isPresent()){
             var category = updatableCategory.get();
-            category.setProductType(productType);
             category.setName(name);
-            category.setBusinessId(businessId);
             productCategoryRepo.save(category);
         }
         return updatableCategory;

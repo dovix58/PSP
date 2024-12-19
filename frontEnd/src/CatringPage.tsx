@@ -3,6 +3,7 @@ import { Box, Grid, Typography, List, ListItem, ListItemText, CircularProgress }
 import CreateOrder from "./CreateOrder";
 import OrderList from "./OrderList";
 import CreateProduct from "./CreateProduct.tsx";
+import CreateCategory from './CreateCategory.tsx';
 
 // Main component that will render MyComponent and the list of items
 export default function CateringPage() {
@@ -23,6 +24,7 @@ export default function CateringPage() {
                 gap: 2,
             }}
         >
+            <CreateCategory/>
             <CreateProduct />
             <OrderList refreshOrders={refreshOrders} onOrderDeletion={handleOrderAdded} />
             <CreateOrder onOrderAdded={handleOrderAdded} />

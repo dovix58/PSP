@@ -1,4 +1,24 @@
-import {Product} from "./entityInterfaces.ts";
+import {Product, Category} from "./entityInterfaces.ts";
+
+
+export function getCategories(): Promise<Category[]> {
+    const headers: Headers = new Headers();
+
+    headers.set('Content-Type', 'application/json');
+    headers.set('Accept', 'application/json');
+
+    const request: RequestInfo = new Request('/api/v1/categories', {
+        method: 'GET',
+        headers: headers
+    });
+
+    return fetch(request)
+        .then(res => res.json())
+        .then(res => {
+            console.log(res);
+            return res as Category[];
+        });
+}
 
 export function getAllProducts(): Promise<Product[]> {
     const headers: Headers = new Headers()
@@ -21,7 +41,7 @@ export function getAllProducts(): Promise<Product[]> {
         })
 }
 
-export function createProduct(name, price, quantity): Promise<Product> {
+export function createProduct(name, price, quantity, categoryId): Promise<Product> {
     const headers: Headers = new Headers()
 
     headers.set('Content-Type', 'application/json')
@@ -32,7 +52,8 @@ export function createProduct(name, price, quantity): Promise<Product> {
         body: JSON.stringify({
             name: name,
             price: price,
-            quantity: quantity
+            quantity: quantity,
+            categoryId: categoryId
         }),
         headers: headers
     })

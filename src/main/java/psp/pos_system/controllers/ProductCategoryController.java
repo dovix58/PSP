@@ -2,6 +2,7 @@ package psp.pos_system.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,23 +29,27 @@ public class ProductCategoryController {
         this.productCategoryService = productCategoryService;
     }
 
+    @CrossOrigin
     @PostMapping(consumes = "application/json")
     public ResponseEntity <ProductCategory> createProductCategory(@RequestBody ProductCategoryDTO dto){
-        return new ResponseEntity<>(productCategoryService.createProductCategory(dto.getProductType(), dto.getName(), dto.getBusinessId()), HttpStatus.CREATED);
+        return new ResponseEntity<>(productCategoryService.createProductCategory(dto.getName()), HttpStatus.CREATED);
     }
 
+    @CrossOrigin
     @GetMapping("/{businessId}")
     public ResponseEntity<List<ProductCategory>> getProductCategoryByBusinessId(UUID businessId){
         var result = productCategoryService.getByBusinessId(businessId);
         return (result.isEmpty()) ? new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @GetMapping
     public ResponseEntity<List<ProductCategory>> getAllProductCategories(){
         var result = productCategoryService.getAll();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @GetMapping("/{id}")
     public ResponseEntity<ProductCategory> getProductCategoryById(@PathVariable UUID categoryId){
         return productCategoryService.getById(categoryId)
@@ -53,11 +58,12 @@ public class ProductCategoryController {
     }
     @PutMapping("/{id}")
     public ResponseEntity<ProductCategory> updateProductCategory(@PathVariable UUID id, @RequestBody ProductCategoryDTO dto){
-        return productCategoryService.update(id, dto.getProductType(), dto.getName(), dto.getBusinessId())
+        return productCategoryService.update(id, dto.getName())
         .map(result -> new ResponseEntity<>(result,HttpStatus.OK))
         .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
+    
+    @CrossOrigin
     @DeleteMapping("/{id}")
     public ResponseEntity<ProductCategory> deleteProductCategory(@PathVariable UUID id){
         return productCategoryService.delete(id)
