@@ -18,10 +18,12 @@ public class ProductServiceImpl implements ProductService {
         this.productRepo = productRepo;
     }
     @Override
-    public Product addProduct(String name, int price) {
+    public Product addProduct(String name, int price, int quantity) {
         Product product = Product.builder()
                 .name(name)
-                .price(price).created(Timestamp.from(Instant.now()))
+                .price(price)
+                .quantity(quantity)
+                .created(Timestamp.from(Instant.now()))
                 .build();
         return productRepo.save(product);
     }
@@ -37,12 +39,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Optional<Product> update(UUID id, String name, int price) {
+    public Optional<Product> update(UUID id, String name, int price, int quantity) {
         var productOptional = productRepo.findById(id);
         if (productOptional.isPresent()) {
             var product = productOptional.get();
             product.setName(name);
             product.setPrice(price);
+            product.setQuantity(quantity);
             productRepo.save(product);
         }
         return productOptional;

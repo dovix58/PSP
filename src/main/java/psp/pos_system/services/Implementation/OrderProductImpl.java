@@ -40,8 +40,13 @@ public class OrderProductImpl implements OrderProductService {
             throw new IllegalArgumentException("This product is already associated with the given order");
         }
         var order = orderRepo.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        var product =  productRepo.findById(createOrderProduct.getProductId()).orElseThrow(() -> new RuntimeException("Product not found"));;
+        var product =  productRepo.findById(createOrderProduct.getProductId()).orElseThrow(() -> new RuntimeException("Product not found"));
 
+        if (product.getQuantity() - createOrderProduct.getQuantity() < 0)
+            throw new IllegalArgumentException("Order product quantity cannot be bigger than actual product quantity");
+
+        product.setQuantity(product.getQuantity() - createOrderProduct.getQuantity());
+        productRepo.save(product);
 
         OrderProduct orderProduct = new OrderProduct();
         orderProduct.setId(key);
@@ -74,28 +79,35 @@ public class OrderProductImpl implements OrderProductService {
 
         OrderProduct orderProduct =  orderProductRepo.findById(key)
                 .orElseThrow(() -> new IllegalArgumentException("OrderProduct not found for orderId: " + orderId + ", productId: " + productId));
-        orderProduct.setQuantity(updateOrderProductRequest.getQuantity());
 
+        var quantityDiff = orderProduct.getQuantity() - updateOrderProductRequest.getQuantity();
+        var product =  productRepo.findById(orderProduct.getProduct().getId()).orElseThrow(() -> new RuntimeException("Product not found"));
+        if (product.getQuantity() + quantityDiff < 0)
+            throw new IllegalArgumentException("Order product quantity cannot be bigger than actual product quantity");
+        product.setQuantity(product.getQuantity() + quantityDiff);
+        productRepo.save(product);
+
+        orderProduct.setQuantity(updateOrderProductRequest.getQuantity());
+        orderProduct.setProduct(product);
         BigInteger bigPrice = BigInteger.valueOf(orderProduct.getProduct().getPrice());
         BigInteger bigQuantity = BigInteger.valueOf(updateOrderProductRequest.getQuantity());
 
         orderProduct.setPrice(bigPrice.multiply(bigQuantity));
         return orderProductRepo.save(orderProduct);
-
-
-
-
-
     }
 
     @Override
     public void deleteOrderProductById(UUID productId, UUID orderId) {
         OrderProductKey key = new OrderProductKey(productId, orderId);
-
         OrderProduct orderProduct =  orderProductRepo.findById(key)
                 .orElseThrow(() -> new IllegalArgumentException("OrderProduct not found for orderId: " + orderId + ", productId: " + productId));
+
+        var product = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setQuantity(product.getQuantity() + orderProduct.getQuantity());
+
+        productRepo.save(product);
+        orderProduct.setProduct(product);
+
         orderProductRepo.deleteById(key);
     }
-
-
 }

@@ -38,7 +38,10 @@ public class OrderController {
     @PutMapping("/{id}/close")
     public ResponseEntity<Order> closeOrder(@PathVariable UUID id){
         return new ResponseEntity<>(orderService.closeOrder(id), HttpStatus.OK);
-
+    }
+    @PutMapping("/{id}/refund")
+    public ResponseEntity<Order> refundOrder(@PathVariable UUID id){
+        return new ResponseEntity<>(orderService.refundOrder(id), HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity deleteOrder(@PathVariable UUID id){

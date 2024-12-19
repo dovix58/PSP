@@ -6,3 +6,4 @@
 - Since we decided to not implement tax and discounts we opted to have a composite primary key for Order_Product which is made up of orderId and ProductId. 
 - In the Order Ent
 - orderProduct url was changed to a more REST format as in orders/{orderId}/products rather than giving the order id in the requestBody
+- We implemeted an inventory management system which was not designed nor talked about in the document.

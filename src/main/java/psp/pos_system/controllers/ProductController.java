@@ -22,7 +22,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody CreateProduct createProduct) {
-        return new ResponseEntity<>(productService.addProduct(createProduct.getName(), createProduct.getPrice()), HttpStatus.CREATED);
+        return new ResponseEntity<>(productService.addProduct(createProduct.getName(), createProduct.getPrice(), createProduct.getQuantity()), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -40,7 +40,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody UpdateProduct updateProduct) {
-        var result = productService.update(UUID.fromString(id), updateProduct.getName(), updateProduct.getPrice());
+        var result = productService.update(UUID.fromString(id), updateProduct.getName(), updateProduct.getPrice(), updateProduct.getQuantity());
         return result.map(product -> new ResponseEntity<>(product, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
