@@ -26,6 +26,72 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [editValue, setEditValue] = useState("");
     const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
     const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
+    const [isAddProductModalOpen, setAddProductModalOpen] = useState(false);
+    const [availableProducts, setAvailableProducts] = useState([]); // For listing available products
+    const [selectedProduct, setSelectedProduct] = useState(null); // Product to be added
+    const [productQuantity, setProductQuantity] = useState(1); // Quantity of the product
+
+    const fetchAvailableProducts = async () => {
+        try {
+            const response = await fetch('/api/v1/products'); // Adjust the endpoint if needed
+            const data = await response.json();
+            setAvailableProducts(data);
+        } catch (error) {
+            console.error('Error fetching available products:', error);
+        }
+    };
+
+    const createOrderProduct = (orderId, product) => {
+        fetch(`/api/v1/orders/${orderId}/products`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId: product.productId,
+                quantity: product.quantity,
+            })
+        })
+    }
+// Open Add Product Modal
+    const handleOpenAddProductModal = () => {
+        setAddProductModalOpen(true);
+        fetchAvailableProducts(); // Fetch products when modal opens
+    };
+
+// Close Add Product Modal
+    const handleCloseAddProductModal = () => {
+        setAddProductModalOpen(false);
+        setSelectedProduct(null);
+        setProductQuantity(1);
+    };
+
+// Handle product submission
+    const handleSubmitProduct = () => {
+        if (!selectedProduct || productQuantity < 1) {
+            alert('Please select a valid product and quantity.');
+            return;
+        }
+
+        // Check if the product already exists in the order
+        const isProductInOrder = products.some(
+            (product) => product.id === selectedProduct.id
+        );
+
+        if (isProductInOrder) {
+            alert('This product is already in the order.');
+            return;
+        }
+
+        // Add the product to the order
+        createOrderProduct(selectedOrder.id, {
+            productId: selectedProduct.id,
+            quantity: productQuantity,
+        });
+
+        handleCloseAddProductModal();
+        handleCloseModal()
+    };
 
     // Fetch orders from backend API
     const fetchOrders = async () => {
@@ -83,9 +149,6 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     };
     useEffect(() => {
         if (!selectedOrder) return;
-
-
-
         fetchOrderDetails();
     }, [selectedOrder]);  // Run when selectedOrder changes
 
@@ -127,7 +190,6 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     }
     const handleEditInputChange = (event) => {
         setEditValue(event.target.value);
-
     };
 
     const handleCancelOrder = async () => {
@@ -311,6 +373,17 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                             <Typography variant="body1">
                                 <strong>Status:</strong> {selectedOrder.orderStatus}
                             </Typography>
+                            {selectedOrder && selectedOrder.orderStatus === "OPEN" && (
+                                <Tooltip title="Add products">
+                                    <Button
+                                        variant="contained"
+                                        sx={{backgroundColor: "green", mt: 1, mb: 2}}
+                                        onClick={handleOpenAddProductModal}
+                                    >
+                                        Add product
+                                    </Button>
+                                </Tooltip>
+                            )}
                             <Box
                                 sx={{
                                     maxHeight: 160,
@@ -398,6 +471,70 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                     )}
                 </Paper>
             </Modal>
+            <Modal
+                open={isAddProductModalOpen}
+                onClose={handleCloseAddProductModal}
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        padding: '16px',
+                        minWidth: '300px',
+                        maxWidth: '500px',
+                    }}
+                >
+                    <Typography variant="h6" gutterBottom>
+                        Add Product to Order
+                    </Typography>
+                    <Box>
+                        <TextField
+                            select
+                            value={selectedProduct || ''}
+                            onChange={(e) => {
+                                const productId = e.target.value;
+                                const product = availableProducts.find((p) => p.id === productId);
+                                setSelectedProduct(product);
+                            }}
+                            fullWidth
+                            SelectProps={{
+                                native: true,
+                            }}
+                            margin="normal"
+                        >
+                            <option value="" disabled>
+                                Choose a product
+                            </option>
+                            {availableProducts.map((product) => (
+                                <option key={product.id} value={product.id}>
+                                    {product.name}
+                                </option>
+                            ))}
+                        </TextField>
+                        <TextField
+                            label="Quantity"
+                            type="number"
+                            value={productQuantity}
+                            onChange={(e) => setProductQuantity(Math.max(1, parseInt(e.target.value, 10)))}
+                            fullWidth
+                            margin="normal"
+                        />
+                    </Box>
+                    <Box display="flex" justifyContent="flex-end" mt={2}>
+                        <Button onClick={handleCloseAddProductModal}>Cancel</Button>
+                        <Button
+                            sx={{ ml: 1 }}
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSubmitProduct}
+                        >
+                            Submit
+                        </Button>
+                    </Box>
+                </Paper>
+            </Modal>
             {/*Refund modal*/}
             <Modal
                 open={isRefundModalOpen}
@@ -481,5 +618,5 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                 />
             )}
         </Box>
-    );
+    )
 }
