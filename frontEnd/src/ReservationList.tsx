@@ -14,6 +14,11 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import dayjs, { Dayjs } from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 interface Reservation {
   id: string; // UUID
@@ -128,7 +133,7 @@ export default function ReservationList(props: any) {
                       <TableCell align="left">
                         {format(
                           new Date(r.appointmentTime),
-                          "MMMM d, yyyy hh:mm "
+                          "MMMM d, yyyy HH:mm "
                         )}
                       </TableCell>
                       <TableCell align="left">
@@ -175,12 +180,13 @@ export default function ReservationList(props: any) {
                         />
                       </TableCell>
                       <TableCell align="left">
-                        <TextField
+                        {/* <TextField
                           value={format(
                             new Date(editingValues?.appointmentTime || ""),
                             "yyyy-MM-dd'T'HH:mm"
                           )}
                           type="datetime-local"
+                          step="3600"
                           onChange={(e) =>
                             setEditingValues((prev) =>
                               prev
@@ -188,7 +194,44 @@ export default function ReservationList(props: any) {
                                 : null
                             )
                           }
-                        />
+                        />*/}
+                        <LocalizationProvider
+                          dateAdapter={AdapterDayjs}
+                          adapterLocale="en-gb"
+                        >
+                          <DemoContainer components={["DateTimePicker"]}>
+                            <DateTimePicker
+                              label="Appointment time"
+                              views={["year", "month", "day", "hours"]}
+                              value={
+                                editingValues?.appointmentTime
+                                  ? dayjs(editingValues.appointmentTime)
+                                  : null
+                              }
+                              onChange={(newValue) => {
+                                // Make sure the value is a Day.js object and reset minutes and seconds to 00
+                                console.log(newValue);
+                                if (newValue) {
+                                  newValue = newValue
+                                    .set("minute", 0)
+                                    .set("second", 0); // Set minutes and seconds to 00
+                                }
+
+                                // Update the value in the state
+                                setEditingValues((prev) =>
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        appointmentTime: newValue
+                                          ? newValue.toISOString()
+                                          : null,
+                                      }
+                                    : null
+                                );
+                              }}
+                            />
+                          </DemoContainer>
+                        </LocalizationProvider>
                       </TableCell>
                       <TableCell align="left">
                         <Stack direction="row" spacing={1}>
