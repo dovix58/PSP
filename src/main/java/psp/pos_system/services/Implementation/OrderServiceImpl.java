@@ -3,10 +3,13 @@ package psp.pos_system.services.Implementation;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import psp.pos_system.models.DTO.OrderProductsResponse;
+import psp.pos_system.models.Keys.OrderProductKey;
 import psp.pos_system.models.Order;
 import psp.pos_system.models.OrderProduct;
 import psp.pos_system.models.enums.OrderStatus;
+import psp.pos_system.repositories.OrderProductRepo;
 import psp.pos_system.repositories.OrderRepo;
+import psp.pos_system.repositories.ProductRepo;
 import psp.pos_system.services.OrderService;
 
 import java.math.BigInteger;
@@ -21,9 +24,13 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepo orderRepo;
+    private final OrderProductRepo orderProductRepo;
+    private final ProductRepo productRepo;
 
-    public OrderServiceImpl(OrderRepo orderRepo) {
+    public OrderServiceImpl(OrderRepo orderRepo, OrderProductRepo orderProductRepo, ProductRepo productRepo) {
         this.orderRepo = orderRepo;
+        this.orderProductRepo = orderProductRepo;
+        this.productRepo = productRepo;
     }
 
     @Override
@@ -47,6 +54,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void deleteOrderById(UUID id) {
+        List<OrderProduct> orderProductList = orderProductRepo.findOrderProductsById_OrderId(id);
+        for (OrderProduct orderProduct : orderProductList) {
+            var product = productRepo.findById(orderProduct.getProduct().getId()).orElseThrow(() -> new RuntimeException("Product not found"));
+            product.setQuantity(product.getQuantity() + orderProduct.getQuantity());
+
+            productRepo.save(product);
+            orderProduct.setProduct(product);
+        }
 
         orderRepo.deleteById(id);
     }

@@ -79,16 +79,15 @@ public class OrderProductImpl implements OrderProductService {
 
         OrderProduct orderProduct =  orderProductRepo.findById(key)
                 .orElseThrow(() -> new IllegalArgumentException("OrderProduct not found for orderId: " + orderId + ", productId: " + productId));
-        orderProduct.setQuantity(updateOrderProductRequest.getQuantity());
 
         var quantityDiff = orderProduct.getQuantity() - updateOrderProductRequest.getQuantity();
-
         var product =  productRepo.findById(orderProduct.getProduct().getId()).orElseThrow(() -> new RuntimeException("Product not found"));
         if (product.getQuantity() + quantityDiff < 0)
             throw new IllegalArgumentException("Order product quantity cannot be bigger than actual product quantity");
         product.setQuantity(product.getQuantity() + quantityDiff);
         productRepo.save(product);
 
+        orderProduct.setQuantity(updateOrderProductRequest.getQuantity());
         orderProduct.setProduct(product);
         BigInteger bigPrice = BigInteger.valueOf(orderProduct.getProduct().getPrice());
         BigInteger bigQuantity = BigInteger.valueOf(updateOrderProductRequest.getQuantity());
@@ -105,6 +104,7 @@ public class OrderProductImpl implements OrderProductService {
 
         var product = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
         product.setQuantity(product.getQuantity() + orderProduct.getQuantity());
+
         productRepo.save(product);
         orderProduct.setProduct(product);
 
