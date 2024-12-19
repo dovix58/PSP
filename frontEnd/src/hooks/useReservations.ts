@@ -11,11 +11,17 @@ interface Reservation {
   appointmentTime: string; // ISO 8601 DateTime format
 }
 
+interface errMsg {
+  message: string;
+  isError: boolean;
+}
+
 type ReservationsResponse = Reservation[];
 
 export default function useReservations() {
   const [reservations, setReservations] = useState<ReservationsResponse[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMessage, setIsMessage] = useState<boolean | errMsg>(false);
 
   const getReservations = async () => {
     setIsLoading(true);
@@ -31,7 +37,6 @@ export default function useReservations() {
     }
   };
   const createReservation = async (formData: any) => {
-    console.log(formData);
     try {
       const response = await fetch("api/v1/reservations", {
         method: "POST",
@@ -95,10 +100,11 @@ export default function useReservations() {
     () => [
       reservations,
       isLoading,
+      isMessage,
       getReservations,
       createReservation,
       updateReservation,
     ],
-    [reservations, isLoading]
+    [reservations, isLoading, isMessage]
   );
 }
