@@ -28,6 +28,7 @@ interface Reservation {
   note: string;
   createdAt: string; // ISO 8601 DateTime format
   updatedAt: string; // ISO 8601 DateTime format
+  fulfilled: boolean;
   appointmentTime: string; // ISO 8601 DateTime format
 }
 
@@ -39,6 +40,25 @@ export default function ReservationList(props: any) {
   const onEditHandler = (reservation: Reservation) => {
     setEditingRowId(reservation.id); // Set the row being edited
     setEditingValues({ ...reservation }); // Initialize with current values
+  };
+
+  const onFulfillHandler = async (id: any) => {
+    try {
+      const response = await fetch(`/api/v1/reservations/fulfill/${id}`, {
+        method: "PUT",
+      });
+
+      if (response.ok) {
+        const message = await response.text(); // Assuming the response is plain text
+        alert(message); // Show success message
+        props.getReservations();
+      } else {
+        const errorMessage = await response.text();
+        alert(errorMessage); // Show error message
+      }
+    } catch (error) {
+      alert("An error occurred. Please try again.");
+    }
   };
 
   // Handler to save the edited reservation
@@ -125,7 +145,12 @@ export default function ReservationList(props: any) {
             </TableHead>
             <TableBody>
               {props.reservations?.map((r: Reservation, index: any) => (
-                <TableRow key={r.id}>
+                <TableRow
+                  key={r.id}
+                  style={{
+                    backgroundColor: r.fulfilled ? "#EAFFF1" : "#fad1d0",
+                  }}
+                >
                   {editingRowId !== r.id ? (
                     <>
                       <TableCell align="left">{r.customer}</TableCell>
@@ -152,6 +177,19 @@ export default function ReservationList(props: any) {
                           >
                             Edit
                           </Button>
+                          {r.fulfilled ? (
+                            ""
+                          ) : (
+                            <Button
+                              variant="outlined"
+                              color="success"
+                              onClick={() => {
+                                onFulfillHandler(r.id);
+                              }}
+                            >
+                              Fulfill
+                            </Button>
+                          )}
                         </Stack>
                       </TableCell>
                     </>
@@ -180,21 +218,6 @@ export default function ReservationList(props: any) {
                         />
                       </TableCell>
                       <TableCell align="left">
-                        {/* <TextField
-                          value={format(
-                            new Date(editingValues?.appointmentTime || ""),
-                            "yyyy-MM-dd'T'HH:mm"
-                          )}
-                          type="datetime-local"
-                          step="3600"
-                          onChange={(e) =>
-                            setEditingValues((prev) =>
-                              prev
-                                ? { ...prev, appointmentTime: e.target.value }
-                                : null
-                            )
-                          }
-                        />*/}
                         <LocalizationProvider
                           dateAdapter={AdapterDayjs}
                           adapterLocale="en-gb"
@@ -209,8 +232,6 @@ export default function ReservationList(props: any) {
                                   : null
                               }
                               onChange={(newValue) => {
-                                // Make sure the value is a Day.js object and reset minutes and seconds to 00
-                                console.log(newValue);
                                 if (newValue) {
                                   newValue = newValue
                                     .set("minute", 0)

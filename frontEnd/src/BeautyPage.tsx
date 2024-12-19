@@ -8,6 +8,7 @@ export default function BeautyPage() {
   const [
     reservations,
     isLoading,
+    isMessage,
     getReservations,
     createReservation,
     updateReservation,
@@ -24,7 +25,10 @@ export default function BeautyPage() {
         gap: 3,
       }}
     >
-      <CreateReservation createReservation={createReservation} />
+      <CreateReservation
+        createReservation={createReservation}
+        isMessage={isMessage}
+      />
       <ReservationList
         reservations={reservations}
         getReservations={getReservations}

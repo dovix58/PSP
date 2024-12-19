@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import psp.pos_system.dtos.reservation.ReservationCreateDTO;
+import psp.pos_system.dtos.reservation.ReservationResponse;
 import psp.pos_system.dtos.reservation.ReservationUpdateDTO;
 import psp.pos_system.dtosMappers.reservation.ReservationCreateMapper;
 import psp.pos_system.dtosMappers.reservation.ReservationUpdateMapper;
@@ -31,9 +32,14 @@ public class ReservationController {
 
 
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@RequestBody ReservationCreateDTO reservationCreateDTO) {
+    public ResponseEntity<?> createReservation(@RequestBody ReservationCreateDTO reservationCreateDTO) {
         Reservation reservation = reservationCreateMapper.toEntity(reservationCreateDTO);
-        return new ResponseEntity<>(reservationService.createReservation(reservation),HttpStatus.CREATED);
+        ReservationResponse response = reservationService.createReservation(reservation);
+        if (response.isSuccess()) {
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping
@@ -52,6 +58,12 @@ public class ReservationController {
         Reservation reservationWithUpdates = reservationUpdateMapper.toEntity(reservationUpdateDTO);
         Reservation updatedReservation = reservationService.updateReservation(id, reservationWithUpdates);
         return new ResponseEntity<>(updatedReservation, HttpStatus.OK);
+    }
+
+    @PutMapping({"/fulfill/{id}"})
+    public ResponseEntity<?> fulfillReservation(@PathVariable UUID id){
+        reservationService.fulfillReservation(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

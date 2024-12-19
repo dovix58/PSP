@@ -1,10 +1,12 @@
 package psp.pos_system.services.Implementation;
 
 import org.springframework.stereotype.Service;
+import psp.pos_system.dtos.reservation.ReservationResponse;
 import psp.pos_system.models.Reservation;
 import psp.pos_system.repositories.ReservationRepo;
 import psp.pos_system.services.ReservationService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +22,15 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Reservation createReservation(Reservation reservation) {
-        return reservationRepo.save(reservation);
+    public ReservationResponse createReservation(Reservation reservation) {
+        LocalDateTime requestedTime = reservation.getAppointmentTime();
+        Optional<Reservation> existingReservation = reservationRepo.findByAppointmentTime(requestedTime);
+        if (existingReservation.isPresent()) {
+            return new ReservationResponse(false, "This time slot is already booked, check reservation list and try again...");
+        }
+        reservationRepo.save(reservation);
+
+        return new ReservationResponse(true, "Reservation successfully created.");
     }
 
     @Override
@@ -30,8 +39,17 @@ public class ReservationServiceImpl implements ReservationService {
             List<Reservation> reservations = reservationRepo.findByBusinessId(businessId.get());
             return reservations;
         } else {
-
             return reservationRepo.findAll();
+        }
+    }
+
+    @Override
+    public void fulfillReservation (UUID id) {
+        Optional<Reservation> reservation = reservationRepo.findById(id);
+        if (reservation.isPresent()) {
+           Reservation res = reservation.get();
+           res.setFulfilled(true);
+           reservationRepo.save(res);
         }
     }
 
