@@ -31,10 +31,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-// Nekreipti demesio, cia kai darysim produktu kategorijas
-//    @ManyToOne
-//    @JoinColumn(name = "category_id")
-//    private ProductCategory categoryId;
+
+    //@ManyToOne
+    //@JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    //private ProductCategory categoryId;
 
     @Column(nullable = false)
     private String name;
@@ -55,4 +55,6 @@ public class Product {
     @JsonBackReference
     @OneToMany(mappedBy = "product", orphanRemoval = true)
     Set<OrderProduct> orders = new HashSet<>();
+
+    
 }
