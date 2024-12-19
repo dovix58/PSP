@@ -28,6 +28,7 @@ interface Reservation {
   note: string;
   createdAt: string; // ISO 8601 DateTime format
   updatedAt: string; // ISO 8601 DateTime format
+  fulfilled: boolean;
   appointmentTime: string; // ISO 8601 DateTime format
 }
 
@@ -39,6 +40,25 @@ export default function ReservationList(props: any) {
   const onEditHandler = (reservation: Reservation) => {
     setEditingRowId(reservation.id); // Set the row being edited
     setEditingValues({ ...reservation }); // Initialize with current values
+  };
+
+  const onFulfillHandler = async (id: any) => {
+    try {
+      const response = await fetch(`/api/v1/reservations/fulfill/${id}`, {
+        method: "PUT",
+      });
+
+      if (response.ok) {
+        const message = await response.text(); // Assuming the response is plain text
+        alert(message); // Show success message
+        props.getReservations();
+      } else {
+        const errorMessage = await response.text();
+        alert(errorMessage); // Show error message
+      }
+    } catch (error) {
+      alert("An error occurred. Please try again.");
+    }
   };
 
   // Handler to save the edited reservation
@@ -125,7 +145,12 @@ export default function ReservationList(props: any) {
             </TableHead>
             <TableBody>
               {props.reservations?.map((r: Reservation, index: any) => (
-                <TableRow key={r.id}>
+                <TableRow
+                  key={r.id}
+                  style={{
+                    backgroundColor: r.fulfilled ? "#EAFFF1" : "#fad1d0",
+                  }}
+                >
                   {editingRowId !== r.id ? (
                     <>
                       <TableCell align="left">{r.customer}</TableCell>
@@ -152,15 +177,19 @@ export default function ReservationList(props: any) {
                           >
                             Edit
                           </Button>
-                          <Button
-                            variant="outlined"
-                            color="success"
-                            onClick={() => {
-                              return 0;
-                            }}
-                          >
-                            Fulfill
-                          </Button>
+                          {r.fulfilled ? (
+                            ""
+                          ) : (
+                            <Button
+                              variant="outlined"
+                              color="success"
+                              onClick={() => {
+                                onFulfillHandler(r.id);
+                              }}
+                            >
+                              Fulfill
+                            </Button>
+                          )}
                         </Stack>
                       </TableCell>
                     </>

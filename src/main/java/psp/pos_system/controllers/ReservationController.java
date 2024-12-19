@@ -60,6 +60,12 @@ public class ReservationController {
         return new ResponseEntity<>(updatedReservation, HttpStatus.OK);
     }
 
+    @PutMapping({"/fulfill/{id}"})
+    public ResponseEntity<?> fulfillReservation(@PathVariable UUID id){
+        reservationService.fulfillReservation(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteReservation(@PathVariable UUID id) {
         reservationService.deleteReservation(id);

@@ -11,6 +11,7 @@ public class ReservationCreateDTO {
     private String customer; // Customer's name
     private String note; //Reservation note
     private String appointmentTime;
+    private boolean isFulfilled;
 
     // Getters
     @Nullable
@@ -38,6 +39,11 @@ public class ReservationCreateDTO {
         return appointmentTime;
     }
 
+    @Nullable
+    public boolean getIsFulfilled() {
+        return isFulfilled;
+    }
+
     // Setters
     public void setBusinessId(UUID bussinesId) {
         this.businessId = bussinesId;
@@ -57,5 +63,9 @@ public class ReservationCreateDTO {
 
     public void setAppointmentTime(String appointmentTime) {
         this.appointmentTime = appointmentTime;
+    }
+
+    public void setIsFulfilled(boolean isFulfilled) {
+        this.isFulfilled = isFulfilled;
     }
 }

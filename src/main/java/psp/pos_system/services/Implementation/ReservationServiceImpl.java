@@ -39,8 +39,17 @@ public class ReservationServiceImpl implements ReservationService {
             List<Reservation> reservations = reservationRepo.findByBusinessId(businessId.get());
             return reservations;
         } else {
-
             return reservationRepo.findAll();
+        }
+    }
+
+    @Override
+    public void fulfillReservation (UUID id) {
+        Optional<Reservation> reservation = reservationRepo.findById(id);
+        if (reservation.isPresent()) {
+           Reservation res = reservation.get();
+           res.setFulfilled(true);
+           reservationRepo.save(res);
         }
     }
 
