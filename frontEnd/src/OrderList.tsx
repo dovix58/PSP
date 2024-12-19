@@ -402,6 +402,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                     totalPrice={totalPrice}
                 />
             )}
+
         </Box>
     );
 }
