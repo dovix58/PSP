@@ -12,7 +12,7 @@ export default function CreateReservation(props: any) {
     e.preventDefault();
     const date = new Date(appointmentTime);
     // Step 2: Convert the Date object to local time (it will use your system's local time zone)
-    const localDateTime = date.toLocaleString();  
+    const localDateTime = date.toLocaleString();
 
     const formData = {
       customer: name, // The name of the customer
@@ -53,6 +53,7 @@ export default function CreateReservation(props: any) {
               variant="standard"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
             <TextField
               id="note"
@@ -60,6 +61,7 @@ export default function CreateReservation(props: any) {
               variant="standard"
               value={note}
               onChange={(e) => setNote(e.target.value)}
+              required
             />
             <LocalizationProvider
               dateAdapter={AdapterDayjs}
@@ -71,6 +73,7 @@ export default function CreateReservation(props: any) {
                   views={["year", "month", "day", "hours"]}
                   value={appointmentTime}
                   onChange={(newValue: any) => setAppointmentTime(newValue)}
+                  required
                 />
               </DemoContainer>
             </LocalizationProvider>
