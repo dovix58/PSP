@@ -22,8 +22,11 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepo orderRepo;
 
-    public OrderServiceImpl(OrderRepo orderRepo) {
+    private final AuthService  authService;
+
+    public OrderServiceImpl(OrderRepo orderRepo, AuthService authService) {
         this.orderRepo = orderRepo;
+        this.authService = authService;
     }
 
     @Override
@@ -32,9 +35,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order createOrder(UUID employeeId) {
+    public Order createOrder() {
         Order order = new Order();
-        order.setEmployeeId(employeeId);
+        order.setEmployeeId(authService.getLoggedUserID());
         order.setOrderStatus(OrderStatus.OPEN);
         order.setCreated(Timestamp.from(Instant.now()));
         return orderRepo.save(order);

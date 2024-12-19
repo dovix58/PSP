@@ -14,12 +14,40 @@ export default function CateringPage() {
         setRefreshOrders((prev) => !prev);
     };
     const handleLogout = () => {
-        fetch('/logout', { method: 'GET' }) // or GET based on your configuration
-            .then(() => {
-                navigate('/')
-            })
+        const response = fetch('/logout', {
+            method: 'POST',
+            credentials: 'include', // Include cookies (session management)
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(() => navigate("/"))
     };
 
+    // const handleLogout= async () => {
+    //     try {
+    //         // Send a GET request to the backend to fetch user details
+    //         const response = await fetch('/api/v1/user', {
+    //             method: 'GET',
+    //             credentials: 'include', // Include cookies if using session-based authentication
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //         });
+    //
+    //         if (response.ok) {
+    //             // Parse the JSON response
+    //             const userDetails = await response.json();
+    //             console.log('User Details:', userDetails);
+    //
+    //         } else {
+    //             console.error('Failed to fetch user details:', response.statusText);
+    //             return null;
+    //         }
+    //     } catch (error) {
+    //         console.error('Error while fetching user details:', error);
+    //         return null;
+    //     }
+    // }
     return (
         <Box
             sx={{

@@ -29,7 +29,7 @@ public class OrderController {
 
     @PostMapping()
     public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest request){
-        return new ResponseEntity<>(orderService.createOrder(request.getEmployeeId()), HttpStatus.CREATED);
+        return new ResponseEntity<>(orderService.createOrder(), HttpStatus.CREATED);
     }
     @GetMapping("/{id}")
     public ResponseEntity<Order> retrieveOrder(@PathVariable UUID id){

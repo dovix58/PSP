@@ -19,22 +19,38 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig{
+
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
+    public SecurityConfig(CustomLogoutSuccessHandler customLogoutSuccessHandler) {
+        this.customLogoutSuccessHandler = customLogoutSuccessHandler;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf().disable() // Disable CSRF (use with caution)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/products").hasAuthority("EMPLOYEE_READ")
+                        .requestMatchers("/api/user").authenticated()
                         .anyRequest().authenticated() // Require authentication for all other requests
 
                 )
                 .logout((logout) -> logout
-                        .logoutSuccessUrl("/my/success/endpoint")
+                        .logoutUrl("/logout") // Custom logout URL
+                        .logoutSuccessUrl("/login?logout") // Redirect after successful logout
+                        .invalidateHttpSession(true) // Invalidate session
+                        .clearAuthentication(true) // Clear authentication
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
+                        .deleteCookies("JSESSIONID") // Delete the JSESSIONID cookie
                         .permitAll()
                 )
-                .httpBasic(Customizer.withDefaults()) // Enable basic HTTP authentication
+                .formLogin(Customizer.withDefaults())
+                
                 .build();
     }
+
+
 
     @Bean
     public UserDetailsService users() {
