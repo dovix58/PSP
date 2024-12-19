@@ -25,6 +25,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [selectedOrderProduct, setSelectedOrderProduct] = useState([]);
     const [editValue, setEditValue] = useState("");
     const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
+    const [loggedInUser, setLoggedInUser] = useState([]);
 
     // Fetch orders from backend API
     const fetchOrders = async () => {
@@ -36,6 +37,21 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
             console.error('Error fetching orders:', error);
         }
     };
+    useEffect(() => {
+        const getUser = async () => {
+            try {
+                const response = await fetch('/api/v1/user');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user data');
+                }
+                const data = await response.json();
+                setLoggedInUser(data);
+            } catch (err) {
+            }
+        };
+
+        getUser();
+    }, []);
 
     // Fetch orders on component mount and whenever refreshOrders changes
     useEffect(() => {
@@ -209,6 +225,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                 overflowY: "auto"
             }}
         >
+
             <Typography variant="h4" gutterBottom>
                 Orders List
             </Typography>

@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -29,20 +28,20 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf().disable() // Disable CSRF (use with caution)
+                .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/products").hasAuthority("EMPLOYEE_READ")
                         .requestMatchers("/api/user").authenticated()
-                        .anyRequest().authenticated() // Require authentication for all other requests
+                        .anyRequest().authenticated()
 
                 )
                 .logout((logout) -> logout
-                        .logoutUrl("/logout") // Custom logout URL
-                        .logoutSuccessUrl("/login?logout") // Redirect after successful logout
-                        .invalidateHttpSession(true) // Invalidate session
-                        .clearAuthentication(true) // Clear authentication
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
                         .logoutSuccessHandler(customLogoutSuccessHandler)
-                        .deleteCookies("JSESSIONID") // Delete the JSESSIONID cookie
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
                 .formLogin(Customizer.withDefaults())
@@ -53,7 +52,7 @@ public class SecurityConfig{
 
 
     @Bean
-    public UserDetailsService users() {
+    public List<UserDetails> userList() {
         UserDetails employee = User.builder()
                 .username("emp")
                 .password("{noop}emp")
@@ -64,7 +63,12 @@ public class SecurityConfig{
                 .password("{noop}owner")
                 .authorities("ROLE_OWNER", "EMPLOYEE_READ", "EMPLOYEE_WRITE")
                 .build();
-        return new InMemoryUserDetailsManager(employee, owner );
+        return List.of(employee, owner);
+    }
+
+    @Bean
+    public InMemoryUserDetailsManager users(List<UserDetails> userList) {
+        return new InMemoryUserDetailsManager(userList);
     }
     @Bean
     CorsConfigurationSource corsConfigurationSource(){

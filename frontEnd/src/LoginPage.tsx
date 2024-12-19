@@ -33,7 +33,7 @@ const LoginPage = () => {
         })
             .then((response) => response.json()) // Handle the JSON response from the server
             .then((data) => console.log('Success:', data)) // Log success
-            .catch(() =>  navigate("/catering")); // Handle error
+            .catch(() =>  navigate("/home")); // Handle error
 
     };
 

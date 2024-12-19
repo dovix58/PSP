@@ -17,6 +17,7 @@ public class AuthService {
         if(authentication != null){
             if(authentication.getPrincipal() instanceof UserDetails user){
                 return UsernameToUUID.resolveUserId(user.getUsername());
+
             }
 
 

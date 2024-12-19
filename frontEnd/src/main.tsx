@@ -13,6 +13,10 @@ const router = createBrowserRouter([
     {
         path: '/catering',
         element: <CateringPage />
+    },
+    {
+        path: '/home',
+        element: <LandingPage />
     }
 ]);
 ReactDOM.createRoot(
