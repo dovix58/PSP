@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+
 import jakarta.persistence.EntityNotFoundException;
 import psp.pos_system.models.ProductCategoryTax;
 import psp.pos_system.repositories.ProductCategoryTaxRepo;
@@ -13,6 +15,7 @@ import psp.pos_system.repositories.TaxRepo;
 import psp.pos_system.services.ProductCategoryTaxService;
 import psp.pos_system.models.Tax;
 
+@Service
 public class ProductCategoryTaxImpl implements ProductCategoryTaxService{
     private final ProductCategoryTaxRepo productCategoryTaxRepo;
 

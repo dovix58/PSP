@@ -28,9 +28,9 @@ public class Product {
     private UUID id;
 
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
-    private ProductCategory categoryId;
+    //@ManyToOne
+    //@JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    //private ProductCategory categoryId;
 
     @Column(nullable = false)
     private String name;
