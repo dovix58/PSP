@@ -12,14 +12,13 @@ import {
     Typography
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
-import {ReactNode, useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import {getAllProducts} from "./api/productAPI";
 
 
 export default function CreateOrder({onOrderAdded}){
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState([]);
-
 
 
     // Fetch items from backend
@@ -188,6 +187,7 @@ export default function CreateOrder({onOrderAdded}){
                                                     }}
                                                 >
                                                     <ListItemText primary={item.name} />
+                                                    <ListItemText primary={item.quantity} />
                                                 </Box>
                                             </Grid>
 

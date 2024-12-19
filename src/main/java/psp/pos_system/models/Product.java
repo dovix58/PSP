@@ -49,6 +49,9 @@ public class Product {
 
     private Timestamp updated;
 
+    @Column(nullable = false)
+    private int quantity;
+
     @JsonBackReference
     @OneToMany(mappedBy = "product", orphanRemoval = true)
     Set<OrderProduct> orders = new HashSet<>();

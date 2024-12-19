@@ -21,7 +21,7 @@ export function getAllProducts(): Promise<Product[]> {
         })
 }
 
-export function createProduct(name, price): Promise<Product> {
+export function createProduct(name, price, quantity): Promise<Product> {
     const headers: Headers = new Headers()
 
     headers.set('Content-Type', 'application/json')
@@ -31,7 +31,8 @@ export function createProduct(name, price): Promise<Product> {
         method: 'POST',
         body: JSON.stringify({
             name: name,
-            price: price
+            price: price,
+            quantity: quantity
         }),
         headers: headers
     })
@@ -43,7 +44,7 @@ export function createProduct(name, price): Promise<Product> {
         })
 }
 
-export function updateProduct(id, name, price): Promise<Product> {
+export function updateProduct(id, name, price, quantity): Promise<Product> {
     const headers: Headers = new Headers()
 
     headers.set('Content-Type', 'application/json')
@@ -53,7 +54,8 @@ export function updateProduct(id, name, price): Promise<Product> {
         method: 'PUT',
         body: JSON.stringify({
             name: name,
-            price: price
+            price: price,
+            quantity: quantity
         }),
         headers: headers
     })

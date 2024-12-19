@@ -12,6 +12,7 @@ export default function CreateProduct() {
     const [items, setItems] = useState([]);
     const [productName, setProductName] = useState("");
     const [productPrice, setProductPrice] = useState("");
+    const [productQuantity, setProductQuantity] = useState("");
 
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null); // Product to edit
@@ -31,11 +32,12 @@ export default function CreateProduct() {
             return;
         }
 
-        createProduct(productName, parseFloat(productPrice) * 100)
+        createProduct(productName, parseFloat(productPrice) * 100, productQuantity)
             .then((newProduct) => {
                 setItems((prevItems) => [...prevItems, newProduct]);
                 setProductName("");
                 setProductPrice("");
+                setProductQuantity("");
             })
             .catch((error) => console.error("Error creating product:", error));
     };
@@ -53,12 +55,12 @@ export default function CreateProduct() {
         setEditModalOpen(true);
     };
 
-    const handleUpdateProduct = (id, name, price) => {
-        updateProduct(id, name, price)
+    const handleUpdateProduct = (id, name, price, quantity) => {
+        updateProduct(id, name, price, quantity)
             .then(() => {
                 setItems((prevItems) =>
                     prevItems.map((item) =>
-                        item.id === id ? { ...item, name, price } : item
+                        item.id === id ? { ...item, name, price, quantity } : item
                     )
                 );
             })
@@ -87,6 +89,14 @@ export default function CreateProduct() {
                         fullWidth
                         margin="normal"
                     />
+                    <TextField
+                        label="Enter product quantity"
+                        type="number"
+                        value={productQuantity}
+                        onChange={(e) => setProductQuantity(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                    />
                     <Button
                         onClick={handleCreateProduct}
                         variant="contained"
@@ -110,13 +120,15 @@ export default function CreateProduct() {
                                                 alignItems: "center",
                                             }}
                                         >
-                                            <ListItemText primary={item.name} />
+                                            <ListItemText primary={item.name} sx={{ mr: 2 }} />
                                             <ListItemText
                                                 primary={new Intl.NumberFormat("en-US", {
                                                     style: "currency",
                                                     currency: "USD",
                                                 }).format(item.price / 100)}
+                                                sx={{ mr: 2 }}
                                             />
+                                            <ListItemText primary={item.quantity} sx={{ mr: 2 }} />
                                             <Button onClick={() => handleEditProduct(item)}>
                                                 <EditIcon />
                                             </Button>
