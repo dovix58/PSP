@@ -6,7 +6,7 @@ import java.util.UUID;
 public class ReservationUpdateDTO {
     private UUID businessId;
     private UUID userId;
-    private LocalDateTime appointmentTime;
+    private String appointmentTime;
     private String customer;
     private String note;
 
@@ -20,7 +20,7 @@ public class ReservationUpdateDTO {
         return userId;
     }
 
-    public LocalDateTime getAppointmentTime() { return appointmentTime; }
+    public String getAppointmentTime() { return appointmentTime; }
 
     public String getCustomer() { return customer; }
 
@@ -35,7 +35,7 @@ public class ReservationUpdateDTO {
         this.userId = userId;
     }
 
-    public void setAppointmentTime(LocalDateTime appointmentTime) {
+    public void setAppointmentTime(String appointmentTime) {
         this.appointmentTime = appointmentTime;
     }
 

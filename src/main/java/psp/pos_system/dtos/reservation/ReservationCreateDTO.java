@@ -10,7 +10,7 @@ public class ReservationCreateDTO {
     private UUID userId;
     private String customer; // Customer's name
     private String note; //Reservation note
-    private LocalDateTime appointmentTime;
+    private String appointmentTime;
 
     // Getters
     @Nullable
@@ -34,12 +34,12 @@ public class ReservationCreateDTO {
     }
 
     @Nullable
-    public LocalDateTime getAppointmentTime() {
+    public String getAppointmentTime() {
         return appointmentTime;
     }
 
     // Setters
-    public void setBussinesId(UUID bussinesId) {
+    public void setBusinessId(UUID bussinesId) {
         this.businessId = bussinesId;
     }
 
@@ -55,7 +55,7 @@ public class ReservationCreateDTO {
         this.note = note;
     }
 
-    public void setAppointmentTime(LocalDateTime appointmentTime) {
+    public void setAppointmentTime(String appointmentTime) {
         this.appointmentTime = appointmentTime;
     }
 }
