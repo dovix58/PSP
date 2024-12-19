@@ -37,25 +37,36 @@ export default function useReservations() {
     }
   };
   const createReservation = async (formData: any) => {
-    try {
-      const response = await fetch("api/v1/reservations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+    console.log(formData);
+    fetch("/api/v1/reservations", {
+      method: "POST", // HTTP method
+      headers: {
+        "Content-Type": "application/json", // Indicate the content type is JSON
+      },
+      body: JSON.stringify(formData),
+    })
+      .then((response) => {
+        // If response is not OK (status code 200-299), handle the error
+        if (!response.ok) {
+          // If it's not a successful response, throw an error
+          return response.json().then((errorData) => {
+            throw new Error(errorData.message || "Something went wrong");
+          });
+        }
+        // If response is OK, parse the response data
+        return response.json();
+      })
+      .then((data) => {
+        // Handle success (for example, log the success message)
+        console.log("Success:", data.message);
+        getReservations(); // Re-fetch the reservations after creation
+        setIsMessage({ message: data.message, isError: false });
+      })
+      .catch((error) => {
+        // Handle error (this will run if the status code is 400 or other errors)
+        setIsMessage({ message: error.message, isError: true });
+        console.log("Error:", error.message);
       });
-
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log("Reservation created successfully:", responseData);
-        await getReservations(); // Re-fetch the reservations after creation
-      } else {
-        console.error("Failed to create reservation:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error during POST request:", error);
-    }
   };
 
   const updateReservation = async (r: Reservation): Promise<boolean> => {
