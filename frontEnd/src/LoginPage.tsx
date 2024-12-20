@@ -39,11 +39,11 @@ const LoginPage = () => {
                     }
                 })
                 .then((data) => {
-                    console.log('Success:', data); // Log success
-                    navigate("/home"); // Navigate to home on success
+                    console.log('Success:', data);
+                    navigate("/home");
                 })
                 .catch((error) => {
-                    console.error('Error:', error); // Log the error
+                    console.error('Error:', error);
                 });
 
 
