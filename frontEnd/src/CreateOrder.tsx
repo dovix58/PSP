@@ -33,25 +33,21 @@ export default function CreateOrder({onOrderAdded}){
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    const [pickedItems, setPickedItems] = useState([]); // Array to track picked item IDs
-    const [quantities, setQuantities] = useState({}); // Object to track quantity for each picked item
+    const [pickedItems, setPickedItems] = useState([]);
+    const [quantities, setQuantities] = useState({});
 
-    // Handler to toggle the picked state of an item
     const handleItemClick = (id) => {
         setPickedItems((prevPickedItems) => {
             if (prevPickedItems.includes(id)) {
-                // If already picked, remove from pickedItems
                 return prevPickedItems.filter((pickedId) => pickedId !== id);
             } else {
-                // If not picked, add to pickedItems
                 return [...prevPickedItems, id];
             }
         });
     };
 
-    // Handler to update the quantity of an item (only accepts integer values)
+
     const handleQuantityChange = (id, value) => {
-        // Ensure that the input value is a valid integer
         const parsedValue = parseInt(value, 10);
         if (!isNaN(parsedValue) && parsedValue > 0) {
             setQuantities((prevQuantities) => ({
@@ -62,16 +58,12 @@ export default function CreateOrder({onOrderAdded}){
     };
     const handleCreateOrder = async () => {
         try {
-            // 1. Create Order using fetch
-            const employeeId = "fc3dc7ef-2e17-406e-818e-1d62e9caef4c"; // hardcoded for now
+
             const createOrderResponse = await fetch('/api/v1/orders', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    employeeId,
-                }),
+                }
             });
 
             if (createOrderResponse.status !== 201) {
@@ -82,13 +74,11 @@ export default function CreateOrder({onOrderAdded}){
             const createOrderData = await createOrderResponse.json();
             const orderId = createOrderData.id; // Assuming the orderId is returned
 
-            // 2. Create OrderProducts using fetch
             const selectedProducts = pickedItems.map((itemId) => ({
                 productId: itemId,
                 quantity: quantities[itemId] || 1,
             }));
 
-            // Use Promise.all to send multiple requests for order products
             const orderProductRequests = selectedProducts.map((product) =>
                 fetch(`/api/v1/orders/${orderId}/products`, {
                     method: 'POST',
@@ -102,10 +92,8 @@ export default function CreateOrder({onOrderAdded}){
                 })
             );
 
-            // Wait for all requests to finish
             await Promise.all(orderProductRequests);
 
-            // Optionally handle success
             alert('Order and Order Products created successfully!');
             handleClose(); // Close the modal
         } catch (error) {
@@ -114,7 +102,6 @@ export default function CreateOrder({onOrderAdded}){
         }
     };
 
-    // Log picked items and quantities to console whenever they change
     useEffect(() => {
         console.log("Picked Items:", pickedItems);
         console.log("Quantities:", quantities);
@@ -212,7 +199,6 @@ export default function CreateOrder({onOrderAdded}){
                             )}
                         </List>
                     </Box>
-                    {/* Add the button to trigger the order creation */}
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                         <Button
                             variant="contained"

@@ -3,7 +3,6 @@ package psp.pos_system.services.Implementation;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import psp.pos_system.models.DTO.OrderProductsResponse;
-import psp.pos_system.models.Keys.OrderProductKey;
 import psp.pos_system.models.Order;
 import psp.pos_system.models.OrderProduct;
 import psp.pos_system.models.enums.OrderStatus;
@@ -27,10 +26,13 @@ public class OrderServiceImpl implements OrderService {
     private final OrderProductRepo orderProductRepo;
     private final ProductRepo productRepo;
 
-    public OrderServiceImpl(OrderRepo orderRepo, OrderProductRepo orderProductRepo, ProductRepo productRepo) {
+    private final AuthService  authService;
+
+    public OrderServiceImpl(OrderRepo orderRepo, OrderProductRepo orderProductRepo, ProductRepo productRepo, AuthService authService) {
         this.orderRepo = orderRepo;
         this.orderProductRepo = orderProductRepo;
         this.productRepo = productRepo;
+        this.authService = authService;
     }
 
     @Override
@@ -39,9 +41,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order createOrder(UUID employeeId) {
+    public Order createOrder() {
         Order order = new Order();
-        order.setEmployeeId(employeeId);
+        order.setEmployeeId(authService.getLoggedUserID());
         order.setOrderStatus(OrderStatus.OPEN);
         order.setCreated(Timestamp.from(Instant.now()));
         return orderRepo.save(order);

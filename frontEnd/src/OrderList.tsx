@@ -92,17 +92,34 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
         handleCloseAddProductModal();
         handleCloseModal()
     };
+    const [loggedInUser, setLoggedInUser] = useState([]);
 
     // Fetch orders from backend API
     const fetchOrders = async () => {
         try {
             const response = await fetch('/api/v1/orders'); // Replace with your API endpoint
             const data = await response.json();
+            console.log("Data: " + data);
             setOrders(data);
         } catch (error) {
             console.error('Error fetching orders:', error);
         }
     };
+    useEffect(() => {
+        const getUser = async () => {
+            try {
+                const response = await fetch('/api/v1/user');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user data');
+                }
+                const data = await response.json();
+                setLoggedInUser(data);
+            } catch (err) {
+            }
+        };
+
+        getUser();
+    }, []);
 
     // Fetch orders on component mount and whenever refreshOrders changes
     useEffect(() => {
@@ -288,6 +305,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                 overflowY: "auto"
             }}
         >
+
             <Typography variant="h4" gutterBottom>
                 Orders List
             </Typography>
@@ -617,6 +635,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                     totalPrice={totalPrice}
                 />
             )}
+
         </Box>
     )
 }

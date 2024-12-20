@@ -1,5 +1,6 @@
 import {Box, Grid} from "@mui/material";
 import {useNavigate} from "react-router-dom";
+import UserList from "./UserList";
 
 
 export default function LandingPage() {

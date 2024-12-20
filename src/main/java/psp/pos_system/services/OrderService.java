@@ -11,7 +11,7 @@ public interface OrderService {
 
     List<Order> getAll();
 
-    Order createOrder(UUID employeeId);
+    Order createOrder();
 
     Order getOrderById(UUID orderId);
 
