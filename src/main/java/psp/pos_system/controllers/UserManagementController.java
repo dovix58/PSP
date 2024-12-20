@@ -4,7 +4,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,12 +62,12 @@ public class UserManagementController {
 //        return ResponseEntity.ok("User updated successfully");
 //    }
 //
-//    @DeleteMapping("/remove/{username}")
-//    public ResponseEntity<String> removeUser(@PathVariable String username) {
-//        if (!userDetailsManager.userExists(username)) {
-//            return ResponseEntity.badRequest().body("User does not exist");
-//        }
-//        userDetailsManager.deleteUser(username);
-//        return ResponseEntity.ok("User removed successfully");
-//    }
+    @DeleteMapping("/{username}")
+    public ResponseEntity<String> removeUser(@PathVariable String username) {
+        if (!userDetailsManager.userExists(username)) {
+            return ResponseEntity.badRequest().body("User does not exist");
+        }
+        userDetailsManager.deleteUser(username);
+        return ResponseEntity.ok("User removed successfully");
+    }
 }

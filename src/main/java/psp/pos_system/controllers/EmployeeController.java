@@ -20,8 +20,8 @@ public class EmployeeController {
 
         if (authentication != null) {
             UserDetails principal = (UserDetails)authentication.getPrincipal();
-            log.debug("Principal: " + principal); // Log the principal
-            log.debug("Principal Class: " + principal.getClass().getName()); // Log the class of principal
+            log.debug("Principal: " + principal);
+            log.debug("Principal Class: " + principal.getClass().getName());
 
             return Map.of(
                     "username", principal.getUsername(),

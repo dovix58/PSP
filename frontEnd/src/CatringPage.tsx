@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import {
+    Button, Box, Dialog, DialogActions, DialogContent, DialogTitle,
+    TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import CreateProduct from './CreateProduct'; // Assuming this component exists
 import OrderList from './OrderList'; // Assuming this component exists
@@ -12,12 +15,13 @@ export default function CateringPage() {
     const [loggedInUser, setLoggedInUser] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [openModal, setOpenModal] = useState(false); // State to control the user list modal visibility
-    const [openCreateUserModal, setOpenCreateUserModal] = useState(false); // State to control the create user modal
-    const [newUser, setNewUser] = useState({
+    const [openModal, setOpenModal] = useState(false);
+    const [openCreateUserModal, setOpenCreateUserModal] = useState(false);
+    const [newUser, setNewUser] = useState(null);
+    const [formValues, setFormValues] = useState({
         username: '',
         password: '',
-        roles: [] // Array to hold the selected roles
+        roles: []
     });
     const [formError, setFormError] = useState('');
     const [formSuccess, setFormSuccess] = useState('');
@@ -30,7 +34,7 @@ export default function CateringPage() {
     const handleLogout = () => {
         const response = fetch('/logout', {
             method: 'POST',
-            credentials: 'include', // Include cookies (session management)
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -38,46 +42,45 @@ export default function CateringPage() {
     };
 
     const handleOpenModal = () => {
-        setOpenModal(true); // Open the user list modal
+        setOpenModal(true);
     };
 
     const handleCloseModal = () => {
-        setOpenModal(false); // Close the user list modal
+        setOpenModal(false);
     };
 
     const handleOpenCreateUserModal = () => {
-        setOpenCreateUserModal(true); // Open the create user modal
+        setOpenCreateUserModal(true);
     };
 
     const handleCloseCreateUserModal = () => {
-        setOpenCreateUserModal(false); // Close the create user modal
+        setOpenCreateUserModal(false);
     };
 
-    // Handle form input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setNewUser((prevUser) => ({
-            ...prevUser,
+        setFormValues((prevValues) => ({
+            ...prevValues,
             [name]: value,
         }));
     };
 
-    // Handle role selection change
+
     const handleRoleChange = (event) => {
         const { value } = event.target;
-        setNewUser((prevUser) => ({
-            ...prevUser,
-            roles: [value], // Since the backend expects an array, we store the role as an array
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            roles: [value],
         }));
     };
 
-    // Submit the form to create a new user
+
     const handleCreateUser = async () => {
         setFormError('');
         setFormSuccess('');
 
-        // Basic validation
-        if (!newUser.username || !newUser.password || !newUser.roles.length) {
+
+        if (!formValues.username || !formValues.password || !formValues.roles.length) {
             setFormError('Username, password, and role are required');
             return;
         }
@@ -89,26 +92,23 @@ export default function CateringPage() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: newUser.username,
-                    password: newUser.password,
-                    roles: newUser.roles // Send the roles as an array
+                    username: formValues.username,
+                    password: formValues.password,
+                    roles: formValues.roles
                 }),
             });
 
             if (!response.ok) {
                 throw new Error('Failed to create user');
             }
+            setNewUser(formValues);
 
             setFormSuccess('User created successfully');
-            setNewUser({ username: '', password: '', roles: [] }); // Clear form after successful submission
-            handleCloseCreateUserModal(); // Close the create user modal
+            setFormValues({ username: '', password: '', roles: [] });
+            handleCloseCreateUserModal();
         } catch (err) {
             setFormError(err.message);
         }
-    };
-
-    const addNewUser = (user) => {
-        setNewUser(user);  // Update state with the new user
     };
 
     useEffect(() => {
@@ -131,6 +131,7 @@ export default function CateringPage() {
         getUser();
     }, []);
 
+
     const isOwner = loggedInUser && loggedInUser.authorities && loggedInUser.authorities.some(auth => auth.authority === 'ROLE_OWNER');
 
     return (
@@ -145,7 +146,7 @@ export default function CateringPage() {
             }}
         >
             <Typography>
-                 Logged in as: {loggedInUser.username}
+                Logged in as: {loggedInUser.username}
             </Typography>
             <CreateProduct />
             <OrderList refreshOrders={refreshOrders} onOrderDeletion={handleOrderAdded} />
@@ -185,7 +186,7 @@ export default function CateringPage() {
                         variant="outlined"
                         fullWidth
                         name="username"
-                        value={newUser.username}
+                        value={formValues.username}
                         onChange={handleInputChange}
                         margin="normal"
                     />
@@ -195,14 +196,14 @@ export default function CateringPage() {
                         type="password"
                         fullWidth
                         name="password"
-                        value={newUser.password}
+                        value={formValues.password}
                         onChange={handleInputChange}
                         margin="normal"
                     />
                     <FormControl fullWidth margin="normal">
                         <InputLabel>Role</InputLabel>
                         <Select
-                            value={newUser.roles[0] || ''}
+                            value={formValues.roles[0] || ''}
                             onChange={handleRoleChange}
                             label="Role"
                             required

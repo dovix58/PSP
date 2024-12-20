@@ -2,7 +2,6 @@ package psp.pos_system.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -21,8 +20,11 @@ public class SecurityConfig{
 
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
-    public SecurityConfig(CustomLogoutSuccessHandler customLogoutSuccessHandler) {
+    private final CustomLoginSuccessHandler customLoginSuccessHandler;
+
+    public SecurityConfig(CustomLogoutSuccessHandler customLogoutSuccessHandler, CustomLoginSuccessHandler customLoginSuccessHandler) {
         this.customLogoutSuccessHandler = customLogoutSuccessHandler;
+        this.customLoginSuccessHandler = customLoginSuccessHandler;
     }
 
     @Bean
@@ -30,7 +32,7 @@ public class SecurityConfig{
         return httpSecurity
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/products").hasAuthority("EMPLOYEE_READ")
+                        .requestMatchers("/api/v1/products").hasAuthority("ROLE_EMPLOYEE")
                         .requestMatchers("/api/user").authenticated()
                         .anyRequest().authenticated()
 
@@ -44,8 +46,8 @@ public class SecurityConfig{
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
-                .formLogin(Customizer.withDefaults())
-                
+                .formLogin(formLogin -> formLogin
+                    .successHandler(customLoginSuccessHandler))
                 .build();
     }
 
@@ -61,7 +63,7 @@ public class SecurityConfig{
         UserDetails owner = User.builder()
                 .username("owner")
                 .password("{noop}owner")
-                .authorities("ROLE_OWNER", "EMPLOYEE_READ", "EMPLOYEE_WRITE")
+                .authorities("ROLE_OWNER", "ROLE_EMPLOYEE")
                 .build();
         return List.of(employee, owner);
     }

@@ -26,14 +26,26 @@ const LoginPage = () => {
         formData.append('username', username);
         formData.append('password', password);
 
+
         // Send form data with fetch
-        fetch('/login', {
-            method: 'POST',
-            body: formData, // Send form data as the request body
-        })
-            .then((response) => response.json()) // Handle the JSON response from the server
-            .then((data) => console.log('Success:', data)) // Log success
-            .catch(() =>  navigate("/home")); // Handle error
+            fetch('/login', {
+                method: 'POST',
+                body: formData,
+            })
+                .then((response) => {
+                    console.log(response);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                })
+                .then((data) => {
+                    console.log('Success:', data); // Log success
+                    navigate("/home"); // Navigate to home on success
+                })
+                .catch((error) => {
+                    console.error('Error:', error); // Log the error
+                });
+
 
     };
 
