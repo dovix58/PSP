@@ -6,6 +6,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -32,7 +34,7 @@ public class SecurityConfig{
         return httpSecurity
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/products").hasAuthority("ROLE_EMPLOYEE")
+                        .requestMatchers("/api/**").hasAuthority("ROLE_EMPLOYEE")
                         .requestMatchers("/api/user").authenticated()
                         .anyRequest().authenticated()
 
@@ -54,18 +56,24 @@ public class SecurityConfig{
 
 
     @Bean
-    public List<UserDetails> userList() {
+    public List<UserDetails> userList(PasswordEncoder passwordEncoder) {
         UserDetails employee = User.builder()
-                .username("emp")
-                .password("{noop}emp")
+                .username("employee")
+                .password(passwordEncoder.encode("123"))
                 .authorities("ROLE_EMPLOYEE")
                 .build();
         UserDetails owner = User.builder()
                 .username("owner")
-                .password("{noop}owner")
+                .password(passwordEncoder.encode("123"))
                 .authorities("ROLE_OWNER", "ROLE_EMPLOYEE")
                 .build();
+
         return List.of(employee, owner);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean

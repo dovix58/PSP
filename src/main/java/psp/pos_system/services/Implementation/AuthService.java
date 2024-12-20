@@ -19,8 +19,6 @@ public class AuthService {
                 return UsernameToUUID.resolveUserId(user.getUsername());
 
             }
-
-
         }
         throw new RuntimeException("User not logged in");
     }

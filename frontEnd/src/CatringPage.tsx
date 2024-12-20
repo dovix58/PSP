@@ -5,13 +5,10 @@ import OrderList from "./OrderList";
 import CreateProduct from "./CreateProduct.tsx";
 import CreateCategory from './CreateCategory.tsx';
 import {
-    Button, Box, Dialog, DialogActions, DialogContent, DialogTitle,
-    TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl
+    Button,  Dialog, DialogActions, DialogContent, DialogTitle,
+    TextField,  IconButton, Select, MenuItem, InputLabel, FormControl
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import CreateProduct from './CreateProduct'; // Assuming this component exists
-import OrderList from './OrderList'; // Assuming this component exists
-import CreateOrder from './CreateOrder'; // Assuming this component exists
 import UserList from './UserList'; // Assuming this component exists
 import AddIcon from '@mui/icons-material/Add'; // Green plus icon
 
