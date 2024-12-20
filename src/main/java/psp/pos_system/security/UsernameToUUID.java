@@ -8,7 +8,7 @@ public class UsernameToUUID {
 
     private static final Map<String, UUID> map = new HashMap<>();
     static {
-        map.put("emp",  UUID.fromString("fc3dc7ef-2e17-406e-818e-1d62e9caef4c"));
+        map.put("employee",  UUID.fromString("fc3dc7ef-2e17-406e-818e-1d62e9caef4c"));
         map.put("owner",  UUID.fromString("fc3dc7ef-2e17-406e-818e-1d62e9c69420"));
     }
     public static UUID resolveUserId(String username){
