@@ -3,6 +3,8 @@ package psp.pos_system.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,30 +40,24 @@ public class UserManagementController {
         if (userDetailsManager.userExists(userDTO.getUsername())) {
             return ResponseEntity.badRequest().body("User already exists");
         }
+
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
+
         UserDetails newUser = User.builder()
                 .username(userDTO.getUsername())
-                .password("{noop}" + userDTO.getPassword())
+                .password(encodedPassword)
                 .authorities(userDTO.getRoles().toArray(new String[0]))
                 .build();
+
+        // Create the user in the system
         userDetailsManager.createUser(newUser);
+
         return ResponseEntity.ok("User added successfully");
     }
 
 
-//    @PutMapping("/update")
-//    public ResponseEntity<String> updateUser(@RequestBody UserDTO userDTO) {
-//        if (!userDetailsManager.userExists(userDTO.getUsername())) {
-//            return ResponseEntity.badRequest().body("User does not exist");
-//        }
-//        UserDetails updatedUser = User.builder()
-//                .username(userDTO.getUsername())
-//                .password("{noop}" + userDTO.getPassword())
-//                .authorities(userDTO.getRoles().toArray(new String[0]))
-//                .build();
-//        userDetailsManager.updateUser(updatedUser);
-//        return ResponseEntity.ok("User updated successfully");
-//    }
-//
+
     @DeleteMapping("/{username}")
     public ResponseEntity<String> removeUser(@PathVariable String username) {
         if (!userDetailsManager.userExists(username)) {
