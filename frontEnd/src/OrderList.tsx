@@ -99,6 +99,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
         try {
             const response = await fetch('/api/v1/orders'); // Replace with your API endpoint
             const data = await response.json();
+            console.log("Data: " + data);
             setOrders(data);
         } catch (error) {
             console.error('Error fetching orders:', error);

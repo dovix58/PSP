@@ -20,7 +20,7 @@ const UsersList = ({ newUser }) => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch("/api/v1/users"); // Replace with your backend API endpoint
+                const response = await fetch("/api/v1/users");
                 const data = await response.json();
                 setUsers(data);
                 console.log(data);

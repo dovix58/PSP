@@ -81,13 +81,18 @@ export default function CateringPage() {
         setFormError('');
         setFormSuccess('');
 
-
+        // Check if all necessary form fields are provided
         if (!formValues.username || !formValues.password || !formValues.roles.length) {
             setFormError('Username, password, and role are required');
             return;
         }
 
         try {
+
+            if (formValues.roles.includes('ROLE_OWNER')) {
+                formValues.roles.push('ROLE_EMPLOYEE');
+            }
+
             const response = await fetch('/api/v1/users', {
                 method: 'POST',
                 headers: {
@@ -96,19 +101,26 @@ export default function CateringPage() {
                 body: JSON.stringify({
                     username: formValues.username,
                     password: formValues.password,
-                    roles: formValues.roles
+                    roles: formValues.roles,
                 }),
             });
 
+            // Check if the response was successful
             if (!response.ok) {
                 throw new Error('Failed to create user');
             }
-            setNewUser(formValues);
 
+            // Set the new user and success message
+            setNewUser(formValues);
             setFormSuccess('User created successfully');
+
+            // Reset form values
             setFormValues({ username: '', password: '', roles: [] });
+
+            // Close the modal
             handleCloseCreateUserModal();
         } catch (err) {
+            // Handle errors
             setFormError(err.message);
         }
     };
