@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -32,9 +34,10 @@ public class Product {
     private UUID id;
 
 
-    //@ManyToOne
-    //@JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
-    //private ProductCategory categoryId;
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    private ProductCategory category;
 
     @Column(nullable = false)
     private String name;

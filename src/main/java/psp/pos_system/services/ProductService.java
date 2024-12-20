@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface ProductService {
     //Veliau prideti categoryId prie argumentu
-    Product addProduct(String name, int price, int quantity);
+    Product addProduct(String name, int price, int quantity, UUID categoryId);
     List<Product> getAll();
     Optional<Product> getById(UUID id);
     Optional<Product> update(UUID id, String name, int price, int quantity);
