@@ -3,10 +3,13 @@ package psp.pos_system.services.Implementation;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import psp.pos_system.models.DTO.OrderProductsResponse;
+import psp.pos_system.models.Keys.OrderProductKey;
 import psp.pos_system.models.Order;
 import psp.pos_system.models.OrderProduct;
 import psp.pos_system.models.enums.OrderStatus;
+import psp.pos_system.repositories.OrderProductRepo;
 import psp.pos_system.repositories.OrderRepo;
+import psp.pos_system.repositories.ProductRepo;
 import psp.pos_system.services.OrderService;
 
 import java.math.BigInteger;
@@ -21,12 +24,17 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepo orderRepo;
+    private final OrderProductRepo orderProductRepo;
+    private final ProductRepo productRepo;
 
     private final AuthService  authService;
 
     public OrderServiceImpl(OrderRepo orderRepo, AuthService authService) {
+    public OrderServiceImpl(OrderRepo orderRepo, OrderProductRepo orderProductRepo, ProductRepo productRepo) {
         this.orderRepo = orderRepo;
         this.authService = authService;
+        this.orderProductRepo = orderProductRepo;
+        this.productRepo = productRepo;
     }
 
     @Override
@@ -50,6 +58,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void deleteOrderById(UUID id) {
+        List<OrderProduct> orderProductList = orderProductRepo.findOrderProductsById_OrderId(id);
+        for (OrderProduct orderProduct : orderProductList) {
+            var product = productRepo.findById(orderProduct.getProduct().getId()).orElseThrow(() -> new RuntimeException("Product not found"));
+            product.setQuantity(product.getQuantity() + orderProduct.getQuantity());
+
+            productRepo.save(product);
+            orderProduct.setProduct(product);
+        }
 
         orderRepo.deleteById(id);
     }
@@ -91,8 +107,22 @@ public class OrderServiceImpl implements OrderService {
     public Order closeOrder(UUID id) {
         Order order = orderRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+        if (order.getOrderStatus() != OrderStatus.OPEN)
+            throw new RuntimeException("Open order can not be refunded");
         order.setCompleted(Timestamp.from(Instant.now()));
         order.setOrderStatus(OrderStatus.CLOSED);
+        orderRepo.save(order);
+        return order;
+    }
+
+    @Override
+    public Order refundOrder(UUID id) {
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+        if (order.getOrderStatus() != OrderStatus.CLOSED)
+            throw new RuntimeException("Open order can not be refunded");
+        order.setOrderStatus(OrderStatus.REFUNDED);
+        order.setUpdated(Timestamp.from(Instant.now()));
         orderRepo.save(order);
         return order;
     }

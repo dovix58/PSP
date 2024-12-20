@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,10 +33,11 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-// Nekreipti demesio, cia kai darysim produktu kategorijas
-//    @ManyToOne
-//    @JoinColumn(name = "category_id")
-//    private ProductCategory categoryId;
+
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    private ProductCategory category;
 
     @Column(nullable = false)
     private String name;
@@ -49,7 +52,12 @@ public class Product {
 
     private Timestamp updated;
 
+    @Column(nullable = false)
+    private int quantity;
+
     @JsonBackReference
     @OneToMany(mappedBy = "product", orphanRemoval = true)
     Set<OrderProduct> orders = new HashSet<>();
+
+    
 }

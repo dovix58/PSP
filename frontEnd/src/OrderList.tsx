@@ -11,9 +11,9 @@ import {
     Tooltip,
     Typography
 } from "@mui/material";
-import CancelIcon from '@mui/icons-material/Cancel';
 import {useEffect, useState} from "react";
 import PaymentModal from "./PaymentModal.tsx";
+import {refundOrder} from "./api/OrderApi.ts";
 
 export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [orders, setOrders] = useState([]);
@@ -25,6 +25,73 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     const [selectedOrderProduct, setSelectedOrderProduct] = useState([]);
     const [editValue, setEditValue] = useState("");
     const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
+    const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
+    const [isAddProductModalOpen, setAddProductModalOpen] = useState(false);
+    const [availableProducts, setAvailableProducts] = useState([]); // For listing available products
+    const [selectedProduct, setSelectedProduct] = useState(null); // Product to be added
+    const [productQuantity, setProductQuantity] = useState(1); // Quantity of the product
+
+    const fetchAvailableProducts = async () => {
+        try {
+            const response = await fetch('/api/v1/products'); // Adjust the endpoint if needed
+            const data = await response.json();
+            setAvailableProducts(data);
+        } catch (error) {
+            console.error('Error fetching available products:', error);
+        }
+    };
+
+    const createOrderProduct = (orderId, product) => {
+        fetch(`/api/v1/orders/${orderId}/products`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId: product.productId,
+                quantity: product.quantity,
+            })
+        })
+    }
+// Open Add Product Modal
+    const handleOpenAddProductModal = () => {
+        setAddProductModalOpen(true);
+        fetchAvailableProducts(); // Fetch products when modal opens
+    };
+
+// Close Add Product Modal
+    const handleCloseAddProductModal = () => {
+        setAddProductModalOpen(false);
+        setSelectedProduct(null);
+        setProductQuantity(1);
+    };
+
+// Handle product submission
+    const handleSubmitProduct = () => {
+        if (!selectedProduct || productQuantity < 1) {
+            alert('Please select a valid product and quantity.');
+            return;
+        }
+
+        // Check if the product already exists in the order
+        const isProductInOrder = products.some(
+            (product) => product.id === selectedProduct.id
+        );
+
+        if (isProductInOrder) {
+            alert('This product is already in the order.');
+            return;
+        }
+
+        // Add the product to the order
+        createOrderProduct(selectedOrder.id, {
+            productId: selectedProduct.id,
+            quantity: productQuantity,
+        });
+
+        handleCloseAddProductModal();
+        handleCloseModal()
+    };
     const [loggedInUser, setLoggedInUser] = useState([]);
 
     // Fetch orders from backend API
@@ -98,9 +165,6 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     };
     useEffect(() => {
         if (!selectedOrder) return;
-
-
-
         fetchOrderDetails();
     }, [selectedOrder]);  // Run when selectedOrder changes
 
@@ -142,7 +206,6 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
     }
     const handleEditInputChange = (event) => {
         setEditValue(event.target.value);
-
     };
 
     const handleCancelOrder = async () => {
@@ -213,6 +276,22 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
         }
     }
 
+    const handleOpenRefundModal = () => {
+        setIsRefundModalOpen(true);
+    };
+
+    const handleCloseRefundModal = () => {
+        setIsRefundModalOpen(false);
+        setModalOpen(false);
+        setSelectedOrder(null);
+        onOrderDeletion();
+    };
+
+    const handleRefund = () => {
+        refundOrder(selectedOrder.id)
+        handleOpenRefundModal();
+    }
+
     return (
         <Box
             sx={{
@@ -281,22 +360,23 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                         <Typography id="order-details-title" variant="h6" gutterBottom>
                             Order Details
                         </Typography>
-                        <Tooltip title="Cancel Order">
-                            <Button
-                                sx={{
-                                    backgroundColor: 'darkred', // Red background color
-                                    color: 'white', // White color for the 'X'
-                                     // Make the button round
-                                    width: 35, // Button width
-                                    height: 35, // Button height
-                                    top: -7,
-                                }}
-                                onClick={handleCancelOrder}
-                            >
-                                Cancel
-                            </Button>
-                        </Tooltip>
-
+                        {selectedOrder && selectedOrder.orderStatus === "OPEN" && (
+                            <Tooltip title="Cancel Order">
+                                <Button
+                                    sx={{
+                                        backgroundColor: 'darkred', // Red background color
+                                        color: 'white', // White color for the 'X'
+                                         // Make the button round
+                                        width: 35, // Button width
+                                        height: 35, // Button height
+                                        top: -7,
+                                    }}
+                                    onClick={handleCancelOrder}
+                                >
+                                    Cancel
+                                </Button>
+                            </Tooltip>
+                        )}
                     </Box>
 
                     {selectedOrder ? (
@@ -310,34 +390,52 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                             <Typography variant="body1">
                                 <strong>Status:</strong> {selectedOrder.orderStatus}
                             </Typography>
-                            <Box sx={{ maxHeight: 160, overflowY: "auto",  border: '1px solid #000', }}>
+                            {selectedOrder && selectedOrder.orderStatus === "OPEN" && (
+                                <Tooltip title="Add products">
+                                    <Button
+                                        variant="contained"
+                                        sx={{backgroundColor: "green", mt: 1, mb: 2}}
+                                        onClick={handleOpenAddProductModal}
+                                    >
+                                        Add product
+                                    </Button>
+                                </Tooltip>
+                            )}
+                            <Box
+                                sx={{
+                                    maxHeight: 160,
+                                    overflowY: "auto",
+                                    border: "1px solid #000",
+                                }}
+                            >
                                 <List>
                                     {products.map((product, index) => (
-                                        <ListItem
-                                            key={index}
-                                            divider
-
-                                        >
-                                            <Box display="flex" justifyContent="flex-end" width="100%" flexDirection="column">
-                                                <Typography>
-                                                    Product: {product.name}
-                                                </Typography>
-                                                <Box display="flex">
-                                                    <Button
-                                                        sx={{ width: 4, backgroundColor: 'gray', color: 'black' }}
-                                                        onClick={() => handleOpenEditModal(product)}>
-                                                        Edit
-                                                    </Button>
-                                                    <Button
-                                                        sx={{ width: 4, backgroundColor: 'red', color: 'white' }}
-                                                        onClick={() => handleDeleteOrderProduct(product.id)}>
-                                                        delete
-                                                    </Button>
-                                                </Box>
+                                        <ListItem key={index} divider>
+                                            <Box
+                                                display="flex"
+                                                justifyContent="flex-end"
+                                                width="100%"
+                                                flexDirection="column"
+                                            >
+                                                <Typography>Product: {product.name}</Typography>
+                                                {selectedOrder.orderStatus === "OPEN" && (
+                                                    <Box display="flex">
+                                                        <Button
+                                                            sx={{ width: 4, backgroundColor: "gray", color: "black" }}
+                                                            onClick={() => handleOpenEditModal(product)}
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                        <Button
+                                                            sx={{ width: 4, backgroundColor: "red", color: "white" }}
+                                                            onClick={() => handleDeleteOrderProduct(product.id)}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    </Box>
+                                                )}
                                                 <Box ml="auto" display="flex" gap={2}>
-                                                    <Typography>
-                                                        Amount: {product.quantity}
-                                                    </Typography>
+                                                    <Typography>Amount: {product.quantity}</Typography>
                                                     <Typography>
                                                         {new Intl.NumberFormat("en-US", {
                                                             style: "currency",
@@ -349,28 +447,144 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                                         </ListItem>
                                     ))}
                                 </List>
-
                             </Box>
                             <Box display="flex" justifyContent="flex-end" mt={1}>
-
-                                <Typography variant="h6">Total Price: {new Intl.NumberFormat("en-US", {
-                                    style: "currency",
-                                    currency: "USD",
-                                }).format(totalPrice / 100)}</Typography>
+                                <Typography variant="h6">
+                                    Total Price:{" "}
+                                    {new Intl.NumberFormat("en-US", {
+                                        style: "currency",
+                                        currency: "USD",
+                                    }).format(totalPrice / 100)}
+                                </Typography>
                             </Box>
-                            {selectedOrder.orderStatus === "OPEN" ? (
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleOpenPaymentModal}
-                                sx={{ mt: 2 }}
-                            >
-                                Pay for Order
-                            </Button>) : (<Typography variant="body1">Order paid</Typography>)}
+                            {selectedOrder.orderStatus === "OPEN" && (
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleOpenPaymentModal}
+                                    sx={{ mt: 2 }}
+                                >
+                                    Pay for Order
+                                </Button>
+                            )}
+
+                            {selectedOrder.orderStatus === "CLOSED" && (
+                                <Box>
+                                    <Typography variant="body1">Order paid</Typography>
+                                    <Button
+                                        id="refundButton"
+                                        variant="contained"
+                                        color="primary"
+                                        sx={{ mt: 2 }}
+                                        onClick={handleRefund}
+                                    >
+                                        Refund
+                                    </Button>
+                                </Box>
+                            )}
                         </Box>
                     ) : (
                         <Typography variant="body1">No order selected.</Typography>
                     )}
+                </Paper>
+            </Modal>
+            <Modal
+                open={isAddProductModalOpen}
+                onClose={handleCloseAddProductModal}
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        padding: '16px',
+                        minWidth: '300px',
+                        maxWidth: '500px',
+                    }}
+                >
+                    <Typography variant="h6" gutterBottom>
+                        Add Product to Order
+                    </Typography>
+                    <Box>
+                        <TextField
+                            select
+                            value={selectedProduct || ''}
+                            onChange={(e) => {
+                                const productId = e.target.value;
+                                const product = availableProducts.find((p) => p.id === productId);
+                                setSelectedProduct(product);
+                            }}
+                            fullWidth
+                            SelectProps={{
+                                native: true,
+                            }}
+                            margin="normal"
+                        >
+                            <option value="" disabled>
+                                Choose a product
+                            </option>
+                            {availableProducts.map((product) => (
+                                <option key={product.id} value={product.id}>
+                                    {product.name}
+                                </option>
+                            ))}
+                        </TextField>
+                        <TextField
+                            label="Quantity"
+                            type="number"
+                            value={productQuantity}
+                            onChange={(e) => setProductQuantity(Math.max(1, parseInt(e.target.value, 10)))}
+                            fullWidth
+                            margin="normal"
+                        />
+                    </Box>
+                    <Box display="flex" justifyContent="flex-end" mt={2}>
+                        <Button onClick={handleCloseAddProductModal}>Cancel</Button>
+                        <Button
+                            sx={{ ml: 1 }}
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSubmitProduct}
+                        >
+                            Submit
+                        </Button>
+                    </Box>
+                </Paper>
+            </Modal>
+            {/*Refund modal*/}
+            <Modal
+                open={isRefundModalOpen}
+                onClose={handleCloseRefundModal}
+                aria-labelledby="refund-success-title"
+                aria-describedby="refund-success-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        padding: '16px',
+                        minWidth: '300px',
+                    }}
+                >
+                    <Box display="flex" flexDirection="column" alignItems="center">
+                        <Typography id="refund-success-title" variant="h6" gutterBottom>
+                            Refund Successful
+                        </Typography>
+                        <Typography id="refund-success-description" variant="body1">
+                            The order has been successfully refunded.
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleCloseRefundModal}
+                            sx={{ mt: 2 }}
+                        >
+                            Close
+                        </Button>
+                    </Box>
                 </Paper>
             </Modal>
             {/* Edit Product Modal */}
@@ -411,6 +625,7 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
                 </Paper>
             </Modal>
             {selectedOrder && (
+
                 <PaymentModal
                     isOpen={isPaymentModalOpen}
                     onClose={handleClosePaymentModal}
@@ -421,5 +636,5 @@ export default function OrderList({refreshOrders,onOrderDeletion}) {
             )}
 
         </Box>
-    );
+    )
 }

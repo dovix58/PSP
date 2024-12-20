@@ -20,17 +20,20 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @CrossOrigin
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody CreateProduct createProduct) {
-        return new ResponseEntity<>(productService.addProduct(createProduct.getName(), createProduct.getPrice()), HttpStatus.CREATED);
+        return new ResponseEntity<>(productService.addProduct(createProduct.getName(), createProduct.getPrice(), createProduct.getQuantity(), createProduct.getCategoryId()), HttpStatus.CREATED);
     }
 
+    @CrossOrigin
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         var result = productService.getAll();
         return (result.isEmpty()) ? new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProduct(@PathVariable String id) {
         var result = productService.getById(UUID.fromString(id));
@@ -38,13 +41,15 @@ public class ProductController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @CrossOrigin
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody UpdateProduct updateProduct) {
-        var result = productService.update(UUID.fromString(id), updateProduct.getName(), updateProduct.getPrice());
+        var result = productService.update(UUID.fromString(id), updateProduct.getName(), updateProduct.getPrice(), updateProduct.getQuantity());
         return result.map(product -> new ResponseEntity<>(product, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @CrossOrigin
     @DeleteMapping("/{id}")
     public ResponseEntity<Product> deleteProduct(@PathVariable String id) {
         var result = productService.delete(UUID.fromString(id));

@@ -51,7 +51,7 @@ export default function LandingPage() {
                         justifyContent: 'center',
                         cursor: 'pointer',
                     }}
-                    onClick={() => handleBoxClick('/')}
+                    onClick={() => handleBoxClick('/beauty')}
                 >
                    Beauty business
                 </Box>

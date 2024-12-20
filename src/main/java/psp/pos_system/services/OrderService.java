@@ -22,4 +22,6 @@ public interface OrderService {
     BigInteger calculateOrderPrice(UUID orderId);
 
     Order closeOrder(UUID id);
+
+    Order refundOrder(UUID id);
 }

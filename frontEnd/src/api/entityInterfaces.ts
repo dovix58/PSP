@@ -2,6 +2,7 @@ export interface Product {
     id: string,
     name: string,
     price: string,
+    quantity: string,
     created: string,
     updated: string
 }
@@ -12,4 +13,12 @@ export interface Order {
     updated: string,
     completed: string,
     orderStatus: string
+}
+
+export interface Category {
+    id: string;
+    name: string;
+    created: string;
+    updated: string;
+    products: any[];
 }

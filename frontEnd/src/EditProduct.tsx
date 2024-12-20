@@ -5,20 +5,21 @@ import { Styles } from "./Styles";
 interface EditProductModalProps {
     open: boolean;
     onClose: () => void;
-    product: { id: number; name: string; price: number };
-    onUpdate: (id: number, name: string, price: number) => void;
+    product: { id: number; name: string; price: number; quantity: number; };
+    onUpdate: (id: number, name: string, price: number, quantity: number) => void;
 }
 
-const EditProductModal: React.FC<EditProductModalProps> = ({ open, onClose, product, onUpdate }) => {
+const EditProductModal: React.FC<EditProductModalProps> = ({ open, onClose, product, onUpdate}) => {
     const [productName, setProductName] = useState(product.name);
     const [productPrice, setProductPrice] = useState((product.price / 100).toString());
+    const [productQuantity, setProductQuantity] = useState(product.quantity);
 
     const handleSubmit = () => {
         if (!productName || !productPrice) {
             alert("Please enter both name and price.");
             return;
         }
-        onUpdate(product.id, productName, parseFloat(productPrice) * 100);
+        onUpdate(product.id, productName, parseFloat(productPrice) * 100, productQuantity);
         onClose();
     };
 
@@ -40,6 +41,14 @@ const EditProductModal: React.FC<EditProductModalProps> = ({ open, onClose, prod
                     type="number"
                     value={productPrice}
                     onChange={(e) => setProductPrice(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                />
+                <TextField
+                    label="Product Price"
+                    type="number"
+                    value={productQuantity}
+                    onChange={(e) => setProductQuantity(e.target.value)}
                     fullWidth
                     margin="normal"
                 />

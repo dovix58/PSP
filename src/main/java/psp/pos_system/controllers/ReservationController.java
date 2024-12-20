@@ -5,7 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import psp.pos_system.dtos.reservation.ReservationCreateDTO;
+import psp.pos_system.dtos.reservation.ReservationResponse;
+import psp.pos_system.dtos.reservation.ReservationUpdateDTO;
 import psp.pos_system.dtosMappers.reservation.ReservationCreateMapper;
+import psp.pos_system.dtosMappers.reservation.ReservationUpdateMapper;
 import psp.pos_system.models.Reservation;
 import psp.pos_system.services.ReservationService;
 
@@ -18,18 +21,25 @@ import java.util.UUID;
 public class ReservationController {
 
     private final ReservationCreateMapper reservationCreateMapper;
+    private final ReservationUpdateMapper reservationUpdateMapper;
     private final ReservationService reservationService;
 
-    public ReservationController(ReservationCreateMapper reservationCreateMapper, ReservationService reservationService) {
+    public ReservationController(ReservationCreateMapper reservationCreateMapper, ReservationUpdateMapper reservationUpdateMapper ,ReservationService reservationService) {
         this.reservationCreateMapper = reservationCreateMapper;
+        this.reservationUpdateMapper = reservationUpdateMapper;
         this.reservationService = reservationService;
     }
 
 
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@RequestBody ReservationCreateDTO reservationCreateDTO) {
+    public ResponseEntity<?> createReservation(@RequestBody ReservationCreateDTO reservationCreateDTO) {
         Reservation reservation = reservationCreateMapper.toEntity(reservationCreateDTO);
-        return new ResponseEntity<>(reservationService.createReservation(reservation),HttpStatus.CREATED);
+        ReservationResponse response = reservationService.createReservation(reservation);
+        if (response.isSuccess()) {
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping
@@ -43,10 +53,21 @@ public class ReservationController {
         return new ResponseEntity<>(reservationService.getReservationById(id), HttpStatus.OK);
     }
 
-    //Reikes dar igyvendint Put metoda
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateReservation(@PathVariable UUID id, @RequestBody ReservationUpdateDTO reservationUpdateDTO){
+        Reservation reservationWithUpdates = reservationUpdateMapper.toEntity(reservationUpdateDTO);
+        Reservation updatedReservation = reservationService.updateReservation(id, reservationWithUpdates);
+        return new ResponseEntity<>(updatedReservation, HttpStatus.OK);
+    }
 
-    @DeleteMapping
-    public ResponseEntity deleteReservation(UUID id) {
+    @PutMapping({"/fulfill/{id}"})
+    public ResponseEntity<?> fulfillReservation(@PathVariable UUID id){
+        reservationService.fulfillReservation(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteReservation(@PathVariable UUID id) {
         reservationService.deleteReservation(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

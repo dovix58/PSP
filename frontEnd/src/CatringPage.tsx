@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Box, Grid, Typography, List, ListItem, ListItemText, CircularProgress } from '@mui/material';
+import CreateOrder from "./CreateOrder";
+import OrderList from "./OrderList";
+import CreateProduct from "./CreateProduct.tsx";
+import CreateCategory from './CreateCategory.tsx';
 import {
     Button, Box, Dialog, DialogActions, DialogContent, DialogTitle,
     TextField, Typography, IconButton, Select, MenuItem, InputLabel, FormControl
@@ -145,6 +150,7 @@ export default function CateringPage() {
                 gap: 2,
             }}
         >
+            <CreateCategory/>
             <Typography>
                 Logged in as: {loggedInUser.username}
             </Typography>

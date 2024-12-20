@@ -1,4 +1,24 @@
-import {Product} from "./entityInterfaces.ts";
+import {Product, Category} from "./entityInterfaces.ts";
+
+
+export function getCategories(): Promise<Category[]> {
+    const headers: Headers = new Headers();
+
+    headers.set('Content-Type', 'application/json');
+    headers.set('Accept', 'application/json');
+
+    const request: RequestInfo = new Request('/api/v1/categories', {
+        method: 'GET',
+        headers: headers
+    });
+
+    return fetch(request)
+        .then(res => res.json())
+        .then(res => {
+            console.log(res);
+            return res as Category[];
+        });
+}
 
 export function getAllProducts(): Promise<Product[]> {
     const headers: Headers = new Headers()
@@ -21,7 +41,7 @@ export function getAllProducts(): Promise<Product[]> {
         })
 }
 
-export function createProduct(name, price): Promise<Product> {
+export function createProduct(name, price, quantity, categoryId): Promise<Product> {
     const headers: Headers = new Headers()
 
     headers.set('Content-Type', 'application/json')
@@ -31,7 +51,9 @@ export function createProduct(name, price): Promise<Product> {
         method: 'POST',
         body: JSON.stringify({
             name: name,
-            price: price
+            price: price,
+            quantity: quantity,
+            categoryId: categoryId
         }),
         headers: headers
     })
@@ -43,7 +65,7 @@ export function createProduct(name, price): Promise<Product> {
         })
 }
 
-export function updateProduct(id, name, price): Promise<Product> {
+export function updateProduct(id, name, price, quantity): Promise<Product> {
     const headers: Headers = new Headers()
 
     headers.set('Content-Type', 'application/json')
@@ -53,7 +75,8 @@ export function updateProduct(id, name, price): Promise<Product> {
         method: 'PUT',
         body: JSON.stringify({
             name: name,
-            price: price
+            price: price,
+            quantity: quantity
         }),
         headers: headers
     })
